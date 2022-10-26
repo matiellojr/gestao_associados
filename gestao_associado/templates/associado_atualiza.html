@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Atualização de Associado</h2>
+<hr>
+
+<div>
+    {% for associado in _query_associados %}
+    <!-- <form action="{{url_for('get_callback')}}" method="post">
+        <input class="form-check-input" name="associado_desabilitado" type="checkbox" role="switch" id="flexSwitchCheckDefault" value="associado.associado_desabilitado">
+        <label class="form-check-label" name="associado_desabilitado" for="flexSwitchCheckDefault">Desabilitado?</label>
+    </form> -->
+    <form action="{{url_for('page_associado_atualiza', id = associado.id)}}" method='POST' class="form-control p-5" >
+
+        <div class="mb-3 form-check form-switch">
+            {% if associado.status_associado %}
+                <input class="form-check-input" name="status_associado" type="checkbox" role="switch" checked id="flexSwitchCheckDefault" value="{{associado.status_associado}}">
+                <label class="form-check-label" name="" for="flexSwitchCheckDefault"><b>Habilitado</b></label>
+            {% else %}
+                <input class="form-check-input" name="status_associado" type="checkbox" role="switch" id="flexSwitchCheckDefault" value="{{not(associado.status_associado)}}">
+                <label class="form-check-label" name="" for="flexSwitchCheckDefault">Desabilitado</label>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label for="">Data atualização:</label>
+            <input type="text" class="p-2 form-control" name="data_atualizada" value="{{associado.data_atualizada}}" data-mask="dd/MM/yyyy" data-mask-selectonfocus="true" disabled required>
+        </div>
+        <div class="mb-3">
+            <label for="">Data de cadastro:</label>
+            <input type="text" class="p-2 form-control" name="data_cadastro" placeholder="Data de cadastro" value="{{associado.data_cadastro}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">CPF:</label>
+            <input type="text" class="p-2 form-control" name="cpf" placeholder="CPF" value="{{associado.cpf}}" required >
+        </div>
+        <div class="mb-3">
+            <label for="">Nome:</label>
+            <input type="text" class="p-2 form-control" name="nome_completo" placeholder="Nome completo" value="{{associado.nome_completo}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">E-mail:</label>
+            <input type="email" class="p-2 form-control" name="email" placeholder="E-mail" value="{{associado.email}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Data de nascimento:</label>
+            <input type="text" class="p-2 form-control" name="data_nascimento" placeholder="Data de nascimento" value="{{associado.data_nascimento}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Endereço:</label>
+            <input type="text" class="p-2 form-control" name="endereco" placeholder="" value="{{associado.endereco}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Cidade:</label>
+            <input type="text" class="p-2 form-control" name="cidade" placeholder="" value="{{associado.cidade}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">UF:</label>
+            <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." value="{{associado.uf}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Telefone/Celular:</label>
+            <input type="text" class="p-2 form-control" name="telefone" placeholder="telefone" value="{{associado.telefone}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Estado Civil:</label>
+            <input type="text" class="p-2 form-control" name="estado_civil" value="{{associado.estado_civil}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Como você se identifica?</label>
+            <input type="text" class=" p-2 form-control" name="como_identifica" placeholder="" value="{{associado.como_identifica}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Situação de trabalho:</label>
+            <input type="text" class="p-2 form-control" name="situacao_trabalho" value="{{associado.situacao_trabalho}}" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Tipo sanguíneo:</label>
+            <input type="text" class="p-2 form-control" name="tipo_sanguineo" value="{{associado.tipo_sanguineo}}" placeholder="" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Quantidade de filhos: </label>
+            <input type="number" class="p-2 form-control" name="quantidades_filhos" value="{{associado.quantidades_filhos}}" placeholder="" required>
+        </div>
+        
+        <div class="mb-3">
+            <button class="btn btn-success">Salvar</button>
+        </div>
+    </form>
+    {% endfor %}
+</div>
+{% endblock conteudo %}
+    
+    

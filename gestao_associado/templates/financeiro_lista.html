@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Lista de Associados Database</h2>
+<hr>
+<div class="p-3">
+    <a href="{{url_for('page_associado_form')}}" class="btn btn-secondary">Adicionar</a>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-secondary">
+        <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    {% for lista in lista_associados %}
+        <tbody class="table-hover">
+            <tr>
+                <th>{{lista.id}}</th>
+                <td>{{lista.nome_completo}}</td>
+                <td>
+                    <a href="{{lista.id}}/associado_atualiza" class="btn btn-secondary btn-xs">
+                        <i class="bi bi-pencil"> Editar</i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    {% endfor %}
+</table>
+
+
+{% endblock conteudo %}
+

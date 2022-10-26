@@ -1,0 +1,17 @@
+fonte associado_atualiza:
+Situação: eu add um cadastro com as informações que tem no formulário, e depois vou para editar, o campo Deficiencia, ele gravou mas não fica como select, pois retorna vazio, quando fica com o select. No momento, está como input;
+A dúvida, como fazer para carregar os dados, no select?
+
+
+Organização das pastas
+Eu quero organizar a pasta, por exemplo, pasta templates/associado, em dentro dela, vai ter os fontes associado_form, associado_atualiza, associado_lista. Eu já tentei fazer isso, mas na hora de executar, dava erro. 
+Pode me mostrar como organizar em pasta e executar corretamente?
+
+Também quero deixar organizado o app.py, para não deixar tudo em um só arquivo, ou é assim mesmo?
+
+
+
+------------------------ Quase Resolvido -
+fonte associado_form:
+Eu quero utilizar o campo Switches que existe no bootstrap, para algumas coisas, como pagamento ou se tem filhos, habilita o campo, só que não sei como utiliza. Pode me ensinar, ou me passar um exemplo? Detalhe: o campo está como "boolean". 
+

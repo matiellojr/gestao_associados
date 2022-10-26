@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Cadastro de Associado Database</h2>
+<hr>
+
+<div>
+
+    <form action="{{url_for('page_associado_form')}}" method='POST' class="form-control p-5" >
+        <div class="form-check form-switch">
+            <input class="form-check-input" name="associado_desabilitado" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            <label class="form-check-label" name="associado_desabilitado" for="flexSwitchCheckDefault">Desabilitado?</label>
+        </div>
+        <div class="mb-3">
+            <label for="">Data atualização:</label>
+            <input type="text" class="p-2 form-control" name="data_atualizada" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Data de cadastro:</label>
+            <input type="text" class="p-2 form-control" name="data_cadastro" placeholder="Data de cadastro" required>
+        </div>
+        <div class="mb-3">
+            <label for="">CPF:</label>
+            <input type="text" class="p-2 form-control" name="cpf" placeholder="CPF" required >
+        </div>
+        <div class="mb-3">
+            <label for="">Nome:</label>
+            <input type="text" class="p-2 form-control" name="nome_completo" placeholder="Nome completo" required>
+        </div>
+        <div class="mb-3">
+            <label for="">E-mail:</label>
+            <input type="text" class="p-2 form-control" name="email" placeholder="E-mail" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Data de nascimento:</label>
+            <input type="text" class="p-2 form-control" name="data_nascimento" placeholder="Data de nascimento" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Endereço:</label>
+            <input type="text" class="p-2 form-control" name="endereco" placeholder="" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Cidade:</label>
+            <input type="text" class="p-2 form-control" name="cidade" placeholder="" required>
+        </div>
+        <div class="mb-3">
+            <label for="">UF:</label>
+            <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." required>
+        </div>
+        <div class="mb-3">
+            <label for="">Telefone/Celular:</label>
+            <input type="text" class="p-2 form-control" name="telefone" placeholder="telefone" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Estado Civil:</label>
+            <select name="estado_civil" class="form-select">
+                <option selected></option>
+                {% for lista in estado_civil %}
+                    <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="">Como você se identifica?</label>
+            <select name="como_identifica" class="form-select">
+                <option selected></option>
+                {% for lista in identificacao %}
+                    <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="">Situação de trabalho:</label>
+            <input type="text" class="p-2 form-control" name="situacao_trabalho" placeholder="Situação de trabalho" required>
+        </div>
+        <div class="mb-3">
+            <label for="">Tipo sanguíneos:</label>
+            <select name="tipo_sanguineo" class="form-select">
+                <option selected></option>
+                {% for lista in tipos %}
+                    <option value="{{lista.tipos}}">{{lista.tipos}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" name="switch_filhos" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            <label class="form-check-label" name="switch_filhos" for="flexSwitchCheckDefault">Tem Filhos?</label>
+        </div>
+        <div class="mb-3">
+            <label for="">Quantidade de filhos: </label>
+            <input type="number" class="p-2 form-control" name="quantidades_filhos" placeholder="" required>
+        </div>
+        
+        <div class="mb-3">
+            <button class="btn btn-success">Adicionar</button>
+        </div>
+        
+    </form>
+</div>
+{% endblock conteudo %}
+    
+    

@@ -1,6 +1,3 @@
-from doctest import FAIL_FAST
-from typing import Set
-from unittest import result
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
@@ -188,11 +185,6 @@ def page_associado_form():
     return render_template("associado_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil)
 
 
-@app.route('/associado_form', methods=['POST', 'GET'])
-def get_callback():
-    siwth = request.form['associado_desabilitado']
-    print(siwth)
-
 
 @app.route('/<int:id>/associado_atualiza' , methods=["GET", "POST"])
 def page_associado_atualiza(id):
@@ -270,12 +262,18 @@ class pagamento(db.Model):
     data_pagamento = sa.Column(sa.Date)
     valor_pagamento = sa.Column(sa.Float)
     comprovante_pagamento = sa.Column(sa.String)
+    mensalidade_id = sa.Column(sa.Integer, sa.ForeignKey("mensalidade.id"))
 
-    def __init__(self, data_pagamento, valor_mensalidade, valor_pagamento, comprovante_pagamento):
+    def __init__(self, data_pagamento, valor_pagamento, comprovante_pagamento, mensalidade_id):
         self.data_pagamento = data_pagamento
         self.valor_pagamento = valor_pagamento
         self.comprovante_pagamento = comprovante_pagamento
+        self.mensalidade_id = mensalidade_id
 
+
+@app.route('/financeiro_form' , methods=["GET", "POST"])
+def page_financeiro_form():
+    return render_template("financeiro_form.html")
 
     
 

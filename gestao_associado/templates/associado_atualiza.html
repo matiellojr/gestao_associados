@@ -3,6 +3,18 @@
 <h2 class="pt-3 text-center">Atualização de Associado</h2>
 <hr>
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert text-center alert-danger">
+        {% for msg in messages %}
+            <b>
+                {{ msg }}
+            </b>    
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endwith %}
+
 <div>
     {% for associado in _query_associados %}
     <form action="{{url_for('page_associado_atualiza', id = associado.id)}}" method='POST' class="form-control p-5" >

@@ -148,6 +148,10 @@ def execute_insert():
 def page_principal():
     return render_template("index.html")
 
+@app.route('/login')
+def page_login():
+    return render_template("login/login_form.html")
+
 
 @app.route('/associado_lista')
 def page_associado_lista():

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{{url_for('.static', filename='css/login_style.css')}}" rel="stylesheet" >
+    <link href="{{url_for('.static', filename='css/login_form_style.css')}}" rel="stylesheet" >
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
@@ -15,40 +15,105 @@
 
 </head>
 <body>
-    <form>
-        <div class="container postion-fixed area">
-            <div class="p-5 col-9 col-sm-6 bg-dark bg-gradient bg-opacity-75 position-absolute top-50 start-50 translate-middle" style="border: solid rgba(255, 255, 255, 0.329);">
-                <form action="" method='POST' class="form-control p-5">
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button class="mb-3 btn btn-success me-md-2">
-                            <b>Cadastrar</b>
-                        </button>
-                    </div>
-
-                    <div>
-                        <div class="form-floating mb-3 ">
-                            <input type="text" class="form-control" name="cpf" id="floatingInput" placeholder="Sem pontos, exemplo: 56488744054">
-                            <label for="floatingInput">CPF:</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="password" class="form-control" name="senha" id="floatingPassword" placeholder="passoword">
-                            <label for="floatingPassword">Senha:</label>
-                        </div>            
-                    </div>
-
-                    <div class="row">
-                        <div class="col p-3 mt-3 text-center">
-                            <button class="mb-3 ml-2 btn btn-primary">
-                                <b>Entrar</b>
-                            </button>
-                            <button class="mb-3 btn btn-danger">
-                                <b>Esqueceu a senha?</b>
-                            </button>
-                        </div>
-                    </div>
-                </form>    
+    <h2 class="pt-3 text-center">Seja bem vindo, associe-se!</h2>
+    <hr>
+    
+    <div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert text-center alert-danger">
+                {% for msg in messages %}
+                    <b>
+                        {{ msg }}
+                    </b>    
+                {% endfor %}
             </div>
-        </div>
-    </form>
+            {% endif %}
+        {% endwith %}
+        <form action="{{url_for('page_login_form')}}" method='POST' class="form-control">
+            <div class="m-5 mb-10">
+                <div class="mb-3">
+                    <label for="">Data atualização:</label>
+                    <input type="text" class="p-2 form-control" name="data_atualizada" value="{{data_hoje}}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Data de cadastro:</label>
+                    <input type="text" class="p-2 form-control" name="data_cadastro" placeholder="Data de cadastro" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">CPF:</label>
+                    <input type="text" class="p-2 form-control" name="cpf" placeholder="Somente números!" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Nome Completo:</label>
+                    <input type="text" class="p-2 form-control" name="nome_completo" placeholder="Nome completo" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">E-mail:</label>
+                    <input type="text" class="p-2 form-control" name="email" placeholder="E-mail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Data de nascimento:</label>
+                    <input type="text" class="p-2 form-control" name="data_nascimento" placeholder="Data de nascimento" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Endereço:</label>
+                    <input type="text" class="p-2 form-control" name="endereco" placeholder="" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Cidade:</label>
+                    <input type="text" class="p-2 form-control" name="cidade" placeholder="" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">UF:</label>
+                    <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Telefone/Celular:</label>
+                    <input type="text" class="p-2 form-control" name="telefone" placeholder="telefone" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Estado Civil:</label>
+                    <select name="estado_civil" class="form-select">
+                        <option selected></option>
+                        {% for lista in estado_civil %}
+                            <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="">Como você se identifica?</label>
+                    <select name="como_identifica" class="form-select">
+                        <option selected></option>
+                        {% for lista in identificacao %}
+                            <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="">Situação de trabalho:</label>
+                    <input type="text" class="p-2 form-control" name="situacao_trabalho" placeholder="Situação de trabalho" required>
+                </div>
+                <div class="mb-3">
+                    <label for="">Tipo sanguíneos:</label>
+                    <select name="tipo_sanguineo" class="form-select">
+                        <option selected></option>
+                        {% for lista in tipos %}
+                            <option value="{{lista.tipos}}">{{lista.tipos}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="">Quantidade de filhos: </label>
+                    <input type="number" class="p-2 form-control" name="quantidades_filhos" placeholder="" required>
+                </div>
+                
+                <div class="mb-3">
+                    <button class="btn btn-success">Adicionar</button>
+                </div>
+            </div>
+        </form>
+    </div>    
 </body>
-</html>    
+    
+    

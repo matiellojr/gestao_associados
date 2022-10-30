@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<h2 class="pt-3 text-center">Cadastro de Associado Database</h2>
+<h2 class="pt-3 text-center">Cadastro de Associado</h2>
 <hr>
 
 {% with messages = get_flashed_messages() %}
@@ -15,7 +15,7 @@
     {% endif %}
 {% endwith %}
 <div>
-    <form action="{{url_for('page_associado_form')}}" method='POST' class="form-control p-5" >
+    <form action="{{url_for('page_associado_form')}}" method='POST' class="form-control p-5">
         <div class="form-check form-switch">
             <div class="mb-3 form-check form-switch">
                 <input class="form-check-input" name="status_associado" type="checkbox" role="switch" disabled  id="flexSwitchCheckDefault">
@@ -35,7 +35,7 @@
             <input type="text" class="p-2 form-control" name="cpf" placeholder="Somente números!" required>
         </div>
         <div class="mb-3">
-            <label for="">Nome:</label>
+            <label for="">Nome Completo:</label>
             <input type="text" class="p-2 form-control" name="nome_completo" placeholder="Nome completo" required>
         </div>
         <div class="mb-3">

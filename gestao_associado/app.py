@@ -1,3 +1,4 @@
+from ctypes.wintypes import PINT
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
@@ -35,7 +36,7 @@ class associados(db.Model):
     quantidades_filhos = sa.Column(sa.Integer)
     status_associado = sa.Column(sa.Boolean)
 
-    def __init__(self, id, cpf, nome_completo, endereco, data_cadastro, cidade, uf,  email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, status_associado, isInsert):
+    def __init__(self, id, cpf, nome_completo, endereco, data_cadastro, cidade, uf,  email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, status_associado):
         self.id = id
         self.data_cadastro = data_cadastro
         self.data_atualizada = data_atualizada
@@ -53,7 +54,6 @@ class associados(db.Model):
         self.como_identifica = como_identifica
         self.quantidades_filhos = quantidades_filhos
         self.status_associado = status_associado
-        self.isInsert = isInsert
 
 
 class tipos_sanguineo(db.Model):
@@ -242,47 +242,47 @@ def page_associado_atualiza(id):
 # Financeiro
 # --------------------------------------------
 # https://lala-rustamli.medium.com/casting-populated-table-column-to-enum-in-flask-with-sqlalchemy-f44fe404d9ae
-class TipoMensalidade(enum.Enum):
-    MENSAL = 'Mensal'
-    ANUAL  = 'Anual'
+# class TipoMensalidade(enum.Enum):
+#     MENSAL = 'Mensal'
+#     ANUAL  = 'Anual'
 
-class StatusMensalidade(enum.Enum):
-    status1 = 'Ainda falta pagar!'
-    status2 = 'Pago!'
-    status3 = 'Atrasado!'
+# class StatusMensalidade(enum.Enum):
+#     status1 = 'Ainda falta pagar!'
+#     status2 = 'Pago!'
+#     status3 = 'Atrasado!'
 
-class mensalidade(db.Model):
-    id = sa.Column(sa.Integer, primary_key = True)
-    tipo_mensalidade = sa.Column(sa.Enum(TipoMensalidade))
-    data_pagamento = sa.Column(sa.Date)
-    data_vencimento = sa.Column(sa.Date)
-    valor_mensalidade = sa.Column(sa.Float)
-    pagamento_confirmado = sa.Column(sa.Boolean)
-    status_mensalidade = sa.Column(sa.Enum(StatusMensalidade))
-    id_pagamento = relationship("pagamento", back_populates="mensalidade")
+# class mensalidade(db.Model):
+#     id = sa.Column(sa.Integer, primary_key = True)
+#     tipo_mensalidade = sa.Column(sa.Enum(TipoMensalidade))
+#     data_pagamento = sa.Column(sa.Date)
+#     data_vencimento = sa.Column(sa.Date)
+#     valor_mensalidade = sa.Column(sa.Float)
+#     pagamento_confirmado = sa.Column(sa.Boolean)
+#     status_mensalidade = sa.Column(sa.Enum(StatusMensalidade))
+#     id_pagamento = relationship("pagamento", back_populates="mensalidade")
 
-    def __init__(self, tipo_mensalidade, data_pagamento, data_vencimento,valor_mensalidade, pagamento_confirmado, status_mensalidade, id_pagamento):
-        self.tipo_mensalidade = tipo_mensalidade
-        self.data_pagamento = data_pagamento
-        self.data_vencimento = data_vencimento
-        self.valor_mensalidade = valor_mensalidade
-        self.pagamento_confirmado = pagamento_confirmado
-        self.status_mensalidade = status_mensalidade
-        self.id_pagamento = id_pagamento
+#     def __init__(self, tipo_mensalidade, data_pagamento, data_vencimento,valor_mensalidade, pagamento_confirmado, status_mensalidade, id_pagamento):
+#         self.tipo_mensalidade = tipo_mensalidade
+#         self.data_pagamento = data_pagamento
+#         self.data_vencimento = data_vencimento
+#         self.valor_mensalidade = valor_mensalidade
+#         self.pagamento_confirmado = pagamento_confirmado
+#         self.status_mensalidade = status_mensalidade
+#         self.id_pagamento = id_pagamento
 
 
-class pagamento(db.Model):
-    id = sa.Column(sa.Integer, primary_key = True)
-    data_pagamento = sa.Column(sa.Date)
-    valor_pagamento = sa.Column(sa.Float)
-    comprovante_pagamento = sa.Column(sa.String)
-    mensalidade_id = sa.Column(sa.Integer, sa.ForeignKey("mensalidade.id"))
+# class pagamento(db.Model):
+#     id = sa.Column(sa.Integer, primary_key = True)
+#     data_pagamento = sa.Column(sa.Date)
+#     valor_pagamento = sa.Column(sa.Float)
+#     comprovante_pagamento = sa.Column(sa.String)
+#     mensalidade_id = sa.Column(sa.Integer, sa.ForeignKey("mensalidade.id"))
 
-    def __init__(self, data_pagamento, valor_pagamento, comprovante_pagamento, mensalidade_id):
-        self.data_pagamento = data_pagamento
-        self.valor_pagamento = valor_pagamento
-        self.comprovante_pagamento = comprovante_pagamento
-        self.mensalidade_id = mensalidade_id
+#     def __init__(self, data_pagamento, valor_pagamento, comprovante_pagamento, mensalidade_id):
+#         self.data_pagamento = data_pagamento
+#         self.valor_pagamento = valor_pagamento
+#         self.comprovante_pagamento = comprovante_pagamento
+#         self.mensalidade_id = mensalidade_id
 
 
 @app.route('/financeiro_form' , methods=["GET", "POST"])
@@ -297,28 +297,32 @@ class login(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
     cpf_login = sa.Column(sa.String(15))
     password_login = sa.Column(sa.String(10))
-    password_backup = sa.Column(sa.String(10))
 
-    def __init__(self, cpf_login, password_login, password_backup):
+    def __init__(self, id, cpf_login, password_login):
+        self.id = id
         self.cpf_login = cpf_login
         self.password_login = password_login
-        self.password_backup = password_backup
         
 
 @app.route('/login')
 def page_login_access():
+    
+    # query_login = db.engine.execute(f"SELECT COUNT(*) FROM LOGIN;")
     return render_template("login/login_access.html")
 
-@app.route('/login_form',  methods=["GET", "POST"])
+@app.route('/login_form', methods=["GET", "POST"])
 def page_login_form():
     query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
     query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
     query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
     query_quantidade_associados = db.engine.execute(f"SELECT COUNT(*) FROM ASSOCIADOS;")
 
+    cpf_login = request.form.get('cpf')
+    password_login = request.form.get('password_login')
+
+    cpf = request.form.get('cpf')
     data_atualizada = request.form.get('data_atualizada')
     data_cadastro = request.form.get('data_cadastro')
-    cpf = request.form.get('cpf')
     nome_completo = request.form.get('nome_completo')
     endereco = request.form.get('endereco')
     email = request.form.get('email')
@@ -331,25 +335,55 @@ def page_login_form():
     situacao_trabalho = request.form.get('situacao_trabalho')
     como_identifica = request.form.get('como_identifica')
     quantidades_filhos = request.form.get('quantidades_filhos')
+    
 
     if (request.method == 'POST'):
         if not(validacao_cpf.Cpf.validate(request.form.get('cpf'))):
             cpf_error = request.form.get('cpf')
-            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}!", "error")
+            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}, deixar assim, 36377907931!", "error")
+        elif (len(password_login) <= 0) and (len(password_login) <= 6) and (len(password_login) > 10):
+            flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
         else:
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
             associado = associados(get_last_id, cpf, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, False)
-            table_login = login(get_last_id, '', '')
+            table_login = login(get_last_id, cpf_login, password_login)
             db.session.add(associado)
             db.session.add(table_login)
             db.session.commit()
-            return redirect(url_for('page_associado_lista'))
+            return redirect(url_for('page_login_access'))
 
     return render_template("login/login_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today())
 
-@app.route('/login_forgot_password')
+
+@app.route('/login_forgot_password', methods=["GET", "POST"])
 def page_login_forgot_password():
+
+    if (request.method == 'POST'):
+        query = db.engine.execute(f"SELECT A.CPF, L.PASSWORD_LOGIN FROM ASSOCIADOS A INNER JOIN LOGIN L ON (L.ID = A.ID) WHERE A.CPF = '{request.form['cpf_login']}';")
+        if not(query.fetchone()):
+            print("não foi encontrado registro na tabela!")
+        get_CPF = query.fetchone()
+        print(get_CPF[0])
+        if not(validacao_cpf.Cpf.validate(request.form['cpf_login'])):
+            cpf_error = request.form['cpf_login']
+            flash(f"O CPF está incorreto: {cpf_error}!", "error")
+
+        # else:
+        #     db.engine.execute(
+        #         f"""
+        #             UPDATE LOGIN SET PASSWORD_LOGIN = {}
+        #         """)
+
+
+        # if not(validacao_cpf.Cpf.validate(request.form.get('cpf_login'))):
+        #     cpf_error = request.form.get('cpf_login')
+        #     flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}, deixar assim, 36377907931!", "error")
+        
+        # get_CPF = query_CPF.fetchone()
+        # flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
+
+
     return render_template("login/login_forgot_password.html")
     
     

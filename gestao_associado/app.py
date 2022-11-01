@@ -200,6 +200,7 @@ def page_associado_form():
 def page_associado_atualiza(id):
     query_associados = db.engine.execute(f"SELECT * FROM ASSOCIADOS WHERE ID = {id} ORDER BY ID;")
 
+    # se clicar no botão Atualizar, no form associado_atualiza
     if (request.method == 'POST'):
         if not(validacao_cpf.Cpf.validate(request.form['cpf'])):
             cpf_error = request.form['cpf']
@@ -304,7 +305,7 @@ class login(db.Model):
         self.password_login = password_login
         
 
-@app.route('/login')
+@app.route('/login_access')
 def page_login_access():
     
     # query_login = db.engine.execute(f"SELECT COUNT(*) FROM LOGIN;")
@@ -315,7 +316,7 @@ def page_login_form():
     query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
     query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
     query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
-    query_quantidade_associados = db.engine.execute(f"SELECT COUNT(*) FROM ASSOCIADOS;")
+    query_quantidade_associados = db.engine.execute("SELECT COUNT(*) FROM ASSOCIADOS;")
 
     cpf_login = request.form.get('cpf')
     password_login = request.form.get('password_login')
@@ -356,36 +357,38 @@ def page_login_form():
     return render_template("login/login_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today())
 
 
-@app.route('/login_forgot_password', methods=["GET", "POST"])
-def page_login_forgot_password():
+@app.route('/login_auth_forgot_password', methods=["GET", "POST"])
+def page_login_auth_forgot_password():
 
     if (request.method == 'POST'):
-        query = db.engine.execute(f"SELECT A.CPF, L.PASSWORD_LOGIN FROM ASSOCIADOS A INNER JOIN LOGIN L ON (L.ID = A.ID) WHERE A.CPF = '{request.form['cpf_login']}';")
-        if not(query.fetchone()):
-            print("não foi encontrado registro na tabela!")
-        get_CPF = query.fetchone()
-        print(get_CPF[0])
-        if not(validacao_cpf.Cpf.validate(request.form['cpf_login'])):
-            cpf_error = request.form['cpf_login']
-            flash(f"O CPF está incorreto: {cpf_error}!", "error")
+        cpf_login = request.form.get('cpf_login')
+        password_login = request.form.get('new_password_login')
 
-        # else:
-        #     db.engine.execute(
-        #         f"""
-        #             UPDATE LOGIN SET PASSWORD_LOGIN = {}
-        #         """)
-
-
-        # if not(validacao_cpf.Cpf.validate(request.form.get('cpf_login'))):
-        #     cpf_error = request.form.get('cpf_login')
-        #     flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}, deixar assim, 36377907931!", "error")
+        if not(validacao_cpf.Cpf.validate(request.form.get('cpf_login'))):
+            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_login}, deixar assim, 36377907931!", "error")
         
-        # get_CPF = query_CPF.fetchone()
-        # flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
+        print('***********')
+        print(len(password_login))
+        print((len(password_login) >= 5) or (len(password_login) <= 10))
+        print('***********')
+        # if (len(password_login) < 5) or (len(password_login) <= 10):
+        #     flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
+        
+        query_cpf = db.engine.execute(f"SELECT * FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
 
+        if not(query_cpf.fetchone()):
+            flash(f"Não foi encontrado o CPF {cpf_login} no sistema!", "error")
+        else:
+            #precisou ser dois diferentes, pois a query_cpf já executou...
+            query_login = db.engine.execute(f"SELECT CPF_LOGIN, PASSWORD_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
+            get_login = query_login.fetchone()
 
-    return render_template("login/login_forgot_password.html")
-    
+            print(get_login[0])
+            print(get_login[1])
+
+        return redirect(url_for('page_login_access'))
+
+    return render_template("login/login_auth_forgot_password.html")
     
     
 # --------------------------------------------------------------

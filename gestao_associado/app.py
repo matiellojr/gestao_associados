@@ -359,20 +359,15 @@ def page_login_form():
 
 @app.route('/login_auth_forgot_password', methods=["GET", "POST"])
 def page_login_auth_forgot_password():
-
     if (request.method == 'POST'):
         cpf_login = request.form.get('cpf_login')
         password_login = request.form.get('new_password_login')
 
         if not(validacao_cpf.Cpf.validate(request.form.get('cpf_login'))):
-            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_login}, deixar assim, 36377907931!", "error")
-        
-        print('***********')
-        print(len(password_login))
-        print((len(password_login) >= 5) or (len(password_login) <= 10))
-        print('***********')
-        # if (len(password_login) < 5) or (len(password_login) <= 10):
-        #     flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
+            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_login}, deixar assim, 36377907931!", "info")
+
+        if (len(password_login) > 10):
+            flash(f"Favor prencher a Senha somente até 10 caracteres!", "error")
         
         query_cpf = db.engine.execute(f"SELECT * FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
 
@@ -385,7 +380,6 @@ def page_login_auth_forgot_password():
 
             print(get_login[0])
             print(get_login[1])
-
         return redirect(url_for('page_login_access'))
 
     return render_template("login/login_auth_forgot_password.html")

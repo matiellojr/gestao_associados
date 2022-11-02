@@ -339,16 +339,17 @@ def page_login_form():
     
 
     if (request.method == 'POST'):
-        if not(validacao_cpf.Cpf.validate(request.form.get('cpf'))):
-            cpf_error = request.form.get('cpf')
-            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}, deixar assim, 36377907931!", "error")
-        elif (len(password_login) <= 0) and (len(password_login) <= 6) and (len(password_login) > 10):
-            flash(f"Favor prencher a Senha de 5 a 10 caracteres!", "error")
+        cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf)
+
+        if not(validacao_cpf.Cpf.validate(cpf)):
+            flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
+        elif (len(password_login) > 10):
+            flash(f"Favor prencher a senha somente até 10 caracteres!", "error")
         else:
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
-            associado = associados(get_last_id, cpf, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, False)
-            table_login = login(get_last_id, cpf_login, password_login)
+            associado = associados(get_last_id, cpf_without_mask, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, False)
+            table_login = login(get_last_id, cpf_without_mask, password_login)
             db.session.add(associado)
             db.session.add(table_login)
             db.session.commit()
@@ -360,19 +361,18 @@ def page_login_form():
 @app.route('/login_auth_forgot_password', methods=["GET", "POST"])
 def page_login_auth_forgot_password():
     if (request.method == 'POST'):
-        cpf_login = request.form.get('cpf_login')
+        cpf_login_mask = request.form.get('cpf_login')
         password_login = request.form.get('new_password_login')
+        cpf_login = validacao_cpf.Cpf.retirapontoshifen(request.form.get('cpf_login'))
 
-        if not(validacao_cpf.Cpf.validate(request.form.get('cpf_login'))):
-            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_login}, deixar assim, 36377907931!", "info")
-
-        if (len(password_login) > 10):
-            flash(f"Favor prencher a Senha somente até 10 caracteres!", "error")
-        
         query_cpf = db.engine.execute(f"SELECT * FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
 
-        if not(query_cpf.fetchone()):
-            flash(f"Não foi encontrado o CPF {cpf_login} no sistema!", "error")
+        if not(validacao_cpf.Cpf.validate(cpf_login)):
+            flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
+        elif (len(password_login) > 10):
+            flash(f"Favor prencher a senha somente até 10 caracteres!", "error")
+        elif not(query_cpf.fetchone()):
+            flash(f"Não foi encontrado o CPF {cpf_login_mask} no sistema!", "error")
         else:
             #precisou ser dois diferentes, pois a query_cpf já executou...
             query_login = db.engine.execute(f"SELECT CPF_LOGIN, PASSWORD_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")

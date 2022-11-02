@@ -4,13 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="{{url_for('.static', filename='css/login_style.css')}}" rel="stylesheet" >
-
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
-
-    <title>ASBLU</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
+    <title>Acesso</title>
 
 
 </head>
@@ -37,7 +39,7 @@
 
                     <div>
                         <div class="form-floating mb-3 ">
-                            <input type="text" class="form-control" name="cpf_login" id="floatingInput" placeholder="Sem pontos, exemplo: 56488744054">
+                            <input type="text" class="form-control" name="cpf_login" id="cpf">
                             <label for="floatingInput">CPF:</label>
                         </div>
                         <div class="form-floating">
@@ -61,4 +63,7 @@
         </div>
     </form>
 </body>
+
+<script type="text/javascript" src="../../static/js/mask_input.js" rel="stylesheet" ></script>
+
 </html>    

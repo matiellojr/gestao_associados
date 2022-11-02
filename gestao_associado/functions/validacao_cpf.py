@@ -15,6 +15,15 @@ class Cpf:
         """
         return "%s.%s.%s-%s" % (cpf[0:3], cpf[3:6], cpf[6:9], cpf[9:11])
 
+    def retirapontoshifen(cpf):
+        """ Verifica se o CPF contem pontos e hifens """
+        if ((cpf.find('.') > 0) or (cpf.find('-') > 0)):
+            cpf = cpf.replace(".", "")
+            cpf = cpf.replace("-", "")
+        
+        return cpf
+
+
     def validate(cpf):
         """
         Method to validate a brazilian CPF number
@@ -31,10 +40,7 @@ class Cpf:
         if cpf in cpf_invalidos:
             return False
 
-        # if not cpf.isDigit():
-        #     """ Verifica se o CPF contem pontos e hifens """
-        #     cpf = cpf.replace(".", "")
-        #     cpf = cpf.replace("-", "")
+        Cpf.retirapontoshifen(cpf)
 
         if len(cpf) < 11:
             """ Verifica se o CPF tem 11 digitos """
@@ -59,3 +65,5 @@ class Cpf:
             cpf.append(f)
 
         return bool(cpf == selfcpf)
+
+    

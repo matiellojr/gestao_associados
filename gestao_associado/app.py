@@ -1,4 +1,3 @@
-from ctypes.wintypes import PINT
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
@@ -26,9 +25,9 @@ class associados(db.Model):
     endereco = sa.Column(sa.String(200))
     cidade = sa.Column(sa.String(200))
     uf = sa.Column(sa.String(2))
-    email = sa.Column(sa.String(100))
+    email = sa.Column(sa.String(200))
     data_nascimento = sa.Column(sa.Date)
-    telefone = sa.Column(sa.String(15))
+    telefone = sa.Column(sa.String(30))
     estado_civil = sa.Column(sa.String(50))
     como_identifica = sa.Column(sa.String())
     situacao_trabalho = sa.Column(sa.String(50))
@@ -179,10 +178,10 @@ def page_associado_form():
     quantidades_filhos = request.form.get('quantidades_filhos')
 
     if (request.method == 'POST'):
-        if not(validacao_cpf.Cpf.validate(request.form.get('cpf'))):
-            cpf_error = request.form.get('cpf')
-            flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}!", "error")
-        else:
+        # if not(validacao_cpf.Cpf.validate(request.form.get('cpf'))):
+        #     cpf_error = request.form.get('cpf')
+        #     flash(f"Favor prencher no campo CPF, que está incorreto: {cpf_error}!", "error")
+        # else:
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
             associado = associados(get_last_id, cpf, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, False)
@@ -192,23 +191,28 @@ def page_associado_form():
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today())
+    return render_template("associado/associado_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil)
 
 
 
 @app.route('/<int:id>/associado_atualiza' , methods=["GET", "POST"])
 def page_associado_atualiza(id):
+    query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
+    query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
     query_associados = db.engine.execute(f"SELECT * FROM ASSOCIADOS WHERE ID = {id} ORDER BY ID;")
+    query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
+
 
     # se clicar no botão Atualizar, no form associado_atualiza
     if (request.method == 'POST'):
-        if not(validacao_cpf.Cpf.validate(request.form['cpf'])):
+        cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(request.form['cpf'])
+        if not(validacao_cpf.Cpf.validate(cpf_without_mask)):
             cpf_error = request.form['cpf']
             flash(f"O CPF está incorreto: {cpf_error}!", "error")
         else:
             data_atualizada = date.today()
             data_cadastro = request.form['data_cadastro']
-            cpf = request.form['cpf']
+            cpf = cpf_without_mask
             nome_completo = request.form['nome_completo']
             endereco = request.form['endereco']
             email = request.form['email']
@@ -236,7 +240,7 @@ def page_associado_atualiza(id):
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_atualiza.html", _query_associados = query_associados)
+    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil)
 
 
 # --------------------------------------------
@@ -296,8 +300,8 @@ def page_financeiro_form():
 # --------------------------------------------------------------
 class login(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
-    cpf_login = sa.Column(sa.String(15))
-    password_login = sa.Column(sa.String(10))
+    cpf_login = sa.Column(sa.String(30))
+    password_login = sa.Column(sa.String())
 
     def __init__(self, id, cpf_login, password_login):
         self.id = id
@@ -340,8 +344,17 @@ def page_login_form():
 
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf)
+        query_cpf = db.engine.execute(f"SELECT STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
+        get_status = query_cpf.fetchone()
 
-        if not(validacao_cpf.Cpf.validate(cpf)):
+        if (query_cpf.fetchone()):
+            encontrou_cpf = f"Foi encontrado o CPF {request.form.get('cpf')} no sistema"
+
+            if not(get_status[0]):
+                flash(f'{encontrou_cpf}, mas a conta está desativada. Se deseja ativar, falar com a diretoria.')
+            else:
+                flash(f'{encontrou_cpf}.')
+        elif not(validacao_cpf.Cpf.validate(cpf_without_mask)):
             flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
         elif (len(password_login) > 10):
             flash(f"Favor prencher a senha somente até 10 caracteres!", "error")
@@ -355,7 +368,7 @@ def page_login_form():
             db.session.commit()
             return redirect(url_for('page_login_access'))
 
-    return render_template("login/login_form.html", tipos = query_tipos_sanguineos,  identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today())
+    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today())
 
 
 @app.route('/login_auth_forgot_password', methods=["GET", "POST"])
@@ -369,8 +382,6 @@ def page_login_auth_forgot_password():
 
         if not(validacao_cpf.Cpf.validate(cpf_login)):
             flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
-        elif (len(password_login) > 10):
-            flash(f"Favor prencher a senha somente até 10 caracteres!", "error")
         elif not(query_cpf.fetchone()):
             flash(f"Não foi encontrado o CPF {cpf_login_mask} no sistema!", "error")
         else:

@@ -31,18 +31,18 @@
 
         <div class="mb-3">
             <label for="">Data atualização:</label>
-            <input type="text" class="p-2 form-control" name="data_atualizada" value="{{associado.data_atualizada}}" data-mask="dd/MM/yyyy" data-mask-selectonfocus="true" disabled required>
+            <input type="date" class="p-2 form-control" name="data_atualizada" placeholder="x" value="{{associado.data_atualizada}}" readonly>
         </div>
         <div class="mb-3">
             <label for="">Data de cadastro:</label>
-            <input type="text" class="p-2 form-control" name="data_cadastro" placeholder="Data de cadastro" value="{{associado.data_cadastro}}" required>
+            <input type="date" class="p-2 form-control" name="data_cadastro" placeholder="Data de cadastro" value="{{associado.data_cadastro}}" readonly>
         </div>
         <div class="mb-3">
             <label for="">CPF:</label>
-            <input type="text" class="p-2 form-control" name="cpf" placeholder="CPF" value="{{associado.cpf}}" required >
+            <input type="text" id="cpf" class="p-2 form-control" name="cpf" placeholder="000.000.000-00" value="{{associado.cpf}}">
         </div>
         <div class="mb-3">
-            <label for="">Nome:</label>
+            <label for="">Nome Completo:</label>
             <input type="text" class="p-2 form-control" name="nome_completo" placeholder="Nome completo" value="{{associado.nome_completo}}" required>
         </div>
         <div class="mb-3">
@@ -51,10 +51,10 @@
         </div>
         <div class="mb-3">
             <label for="">Data de nascimento:</label>
-            <input type="text" class="p-2 form-control" name="data_nascimento" placeholder="Data de nascimento" value="{{associado.data_nascimento}}" required>
+            <input type="date" class="p-2 form-control" name="data_nascimento" placeholder="Data de nascimento" value="{{associado.data_nascimento}}" required>
         </div>
         <div class="mb-3">
-            <label for="">Endereço:</label>
+            <label for="">Endereço completo:</label>
             <input type="text" class="p-2 form-control" name="endereco" placeholder="" value="{{associado.endereco}}" required>
         </div>
         <div class="mb-3">
@@ -63,39 +63,72 @@
         </div>
         <div class="mb-3">
             <label for="">UF:</label>
-            <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." value="{{associado.uf}}" required>
+            <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR, SP" value="{{associado.uf}}" required>
         </div>
         <div class="mb-3">
             <label for="">Telefone/Celular:</label>
-            <input type="text" class="p-2 form-control" name="telefone" placeholder="telefone" value="{{associado.telefone}}" required>
+            <input type="text" id="telefone" class="p-2 form-control" name="telefone" placeholder="telefone" value="{{associado.telefone}}" required>
         </div>
+
         <div class="mb-3">
             <label for="">Estado Civil:</label>
-            <input type="text" class="p-2 form-control" name="estado_civil" value="{{associado.estado_civil}}" required>
+            <select name="estado_civil" class="form-select">
+                {% for lista in estado_civil %}
+                    {% if associado.estado_civil == lista.tipo %}
+                        <option selected value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% else %}
+                        <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         </div>
+
         <div class="mb-3">
             <label for="">Como você se identifica?</label>
-            <input type="text" class=" p-2 form-control" name="como_identifica" placeholder="" value="{{associado.como_identifica}}" required>
+            <select name="como_identifica" class="form-select">
+                {% for lista in identificacao %}
+                    {% if associado.como_identifica == lista.tipo %}
+                        <option selected value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% else %}
+                        <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         </div>
+        
         <div class="mb-3">
             <label for="">Situação de trabalho:</label>
             <input type="text" class="p-2 form-control" name="situacao_trabalho" value="{{associado.situacao_trabalho}}" required>
         </div>
+
         <div class="mb-3">
-            <label for="">Tipo sanguíneo:</label>
-            <input type="text" class="p-2 form-control" name="tipo_sanguineo" value="{{associado.tipo_sanguineo}}" placeholder="" required>
+            <label for="">Tipo sanguíneos:</label>
+            <select name="tipo_sanguineo" class="form-select">
+                <option selected></option>
+                {% for lista_sanguineos in tipos_sanguineos %}
+                    {% if associado.tipo_sanguineo == lista_sanguineos.tipos %}
+                        <option selected value="{{lista_sanguineos.tipos}}">{{lista_sanguineos.tipos}}</option>
+                    {% else %}
+                        <option value="{{lista_sanguineos.tipos}}">{{lista_sanguineos.tipos}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
         </div>
+
         <div class="mb-3">
             <label for="">Quantidade de filhos: </label>
             <input type="number" class="p-2 form-control" name="quantidades_filhos" value="{{associado.quantidades_filhos}}" placeholder="" required>
         </div>
         
         <div class="mb-3">
-            <button class="btn btn-success">Salvar</button>
+            <button class="btn btn-success">Atualizar</button>
         </div>
     </form>
     {% endfor %}
 </div>
+
+<script type="text/javascript" src="../../static/js/mask_input.js" rel="stylesheet" ></script>
+
 {% endblock conteudo %}
     
     

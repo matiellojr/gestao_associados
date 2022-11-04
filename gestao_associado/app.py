@@ -10,7 +10,7 @@ import psycopg2
 
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///moviestest.sqlite3'
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:admin@localhost/aulapython"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:admin@localhost/gestao_associados_asblu"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -344,20 +344,18 @@ def page_login_form():
 
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf)
-        query_cpf = db.engine.execute(f"SELECT STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
+        query_cpf = db.engine.execute(f"SELECT CPF, STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
         get_status = query_cpf.fetchone()
 
-        if (query_cpf.fetchone()):
+        if (get_status[0]):
             encontrou_cpf = f"Foi encontrado o CPF {request.form.get('cpf')} no sistema"
 
-            if not(get_status[0]):
+            if not(get_status[1]):
                 flash(f'{encontrou_cpf}, mas a conta está desativada. Se deseja ativar, falar com a diretoria.')
             else:
                 flash(f'{encontrou_cpf}.')
         elif not(validacao_cpf.Cpf.validate(cpf_without_mask)):
             flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
-        elif (len(password_login) > 10):
-            flash(f"Favor prencher a senha somente até 10 caracteres!", "error")
         else:
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
@@ -375,22 +373,32 @@ def page_login_form():
 def page_login_auth_forgot_password():
     if (request.method == 'POST'):
         cpf_login_mask = request.form.get('cpf_login')
-        password_login = request.form.get('new_password_login')
-        cpf_login = validacao_cpf.Cpf.retirapontoshifen(request.form.get('cpf_login'))
+        new_password_login = request.form.get('new_password_login')
+        cpf_login_without_mask = validacao_cpf.Cpf.retirapontoshifen(request.form.get('cpf_login'))
 
-        query_cpf = db.engine.execute(f"SELECT * FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
+        query_cpf = db.engine.execute(f"SELECT * FROM LOGIN WHERE CPF_LOGIN = '{cpf_login_without_mask}';")
 
-        if not(validacao_cpf.Cpf.validate(cpf_login)):
-            flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login}!", "error")
+        if not(validacao_cpf.Cpf.validate(cpf_login_without_mask)):
+            flash(f"Favor prencher o campo CPF, está incorreto: {cpf_login_mask}!", "error")
         elif not(query_cpf.fetchone()):
             flash(f"Não foi encontrado o CPF {cpf_login_mask} no sistema!", "error")
         else:
             #precisou ser dois diferentes, pois a query_cpf já executou...
-            query_login = db.engine.execute(f"SELECT CPF_LOGIN, PASSWORD_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_login}';")
-            get_login = query_login.fetchone()
+            query_login = db.engine.execute(f"SELECT CPF_LOGIN, PASSWORD_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_login_without_mask}';")
+            get_query = query_login.fetchone()
 
-            print(get_login[0])
-            print(get_login[1])
+            if (get_query[1] != new_password_login):
+                db.engine.execute(
+                    f"""
+                        UPDATE LOGIN SET PASSWORD_LOGIN = '{new_password_login}' WHERE CPF_LOGIN={cpf_login_without_mask};
+                    """)
+                db.session.commit()
+                flash(f"Senha alterada!", "error")
+            else:
+                flash(f"As senhas são as mesmas!", "error")
+                
+            
+            
         return redirect(url_for('page_login_access'))
 
     return render_template("login/login_auth_forgot_password.html")

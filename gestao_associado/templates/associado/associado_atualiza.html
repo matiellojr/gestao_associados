@@ -5,11 +5,9 @@
 
 {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <div class="alert text-center alert-danger">
+    <div class="alert text-center alert-danger" role="alert">
         {% for msg in messages %}
-            <b>
-                {{ msg }}
-            </b>    
+            <h4> {{ msg }} </h4>    
         {% endfor %}
     </div>
     {% endif %}
@@ -102,7 +100,7 @@
         </div>
 
         <div class="mb-3">
-            <label for="">Tipo sanguíneos:</label>
+            <label for="">Tipo sanguíneo:</label>
             <select name="tipo_sanguineo" class="form-select">
                 <option selected></option>
                 {% for lista_sanguineos in tipos_sanguineos %}
@@ -126,8 +124,6 @@
     </form>
     {% endfor %}
 </div>
-
-<script type="text/javascript" src="../../static/js/mask_input.js" rel="stylesheet" ></script>
 
 {% endblock conteudo %}
     

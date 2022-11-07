@@ -10,8 +10,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.0/jquery.mask.js"></script>
-    <title>Acesso</title>
-
+    
     <title>ASBLU</title>
 
 </head>
@@ -32,7 +31,7 @@
                     <a class="nav-link" href="{{url_for('page_associado_lista')}}">Associados Database</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('page_financeiro_form')}}">Financeiro</a>
+                    <a class="nav-link" href="{{url_for('page_mensalidade_form')}}">Mensalidade</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{{url_for('page_login_access')}}">login?</a>
@@ -46,6 +45,7 @@
     <div class="pt-5 container">
         {% block conteudo %}
         {% endblock conteudo %}
+        <script type="text/javascript" src="../../static/js/mask_input.js" rel="stylesheet" ></script>
     </div>
 
     <div class="container">

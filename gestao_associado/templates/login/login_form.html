@@ -67,14 +67,30 @@
                     <label for="">Endereço Completo:</label>
                     <input type="text" class="p-2 form-control" name="endereco" placeholder="" required>
                 </div>
-                <div class="mb-3">
-                    <label for="">Cidade:</label>
-                    <input type="text" class="p-2 form-control" name="cidade" placeholder="" required>
+                <div class="row g-4 mb-3">
+                    <div class="col-auto">
+                        <label for="">UF:</label>
+                        <select name="uf" class="form-select" required>
+                            <!-- <option selected></option> -->
+                            {% for lista_uf in unidade_federativa %}
+                                <option value="{{lista_uf}}">{{lista_uf}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-8">
+                        <label for="">Cidade:</label>
+                        <select name="uf" class="form-select" required>
+                            <option selected></option>
+                            {% for lista in cidades_pr %}
+                                <option value="{{lista}}">{{lista}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="">UF:</label>
                     <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." required>
-                </div>
+                </div> -->
                 <div class="mb-3">
                     <label for="">Telefone/Celular:</label>
                     <input type="text" id="telefone" class="p-2 form-control" name="telefone" placeholder="(00) 0 0000-0000" required>
@@ -102,7 +118,7 @@
                     <input type="text" class="p-2 form-control" name="situacao_trabalho" placeholder="Situação de trabalho" required>
                 </div>
                 <div class="mb-3">
-                    <label for="">Tipo sanguíneos:</label>
+                    <label for="">Tipo sanguíneo:</label>
                     <select name="tipo_sanguineo" class="form-select">
                         <option selected></option>
                         {% for lista in tipos %}
@@ -116,7 +132,7 @@
                 </div>
                 
                 <div class="mb-3">
-                    <button class="btn btn-success">Adicionar</button>
+                    <button class="btn btn-success">Cadastrar</button>
                 </div>
             </div>
         </form>

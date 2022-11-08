@@ -241,7 +241,7 @@ def page_associado_atualiza(id):
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil)
+    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
 
 
 # --------------------------------------------
@@ -295,7 +295,7 @@ def page_mensalidade_form():
     if (request.method == 'POST'):
         get_id = query_count_mensalidade.fetchone()
         get_last_id = get_id[0] + 1
-        print(request.form.get('tipo_mensalidade'))
+        
         if (request.form.get('tipo_mensalidade')):
             ehMensal = True
         else:
@@ -358,13 +358,18 @@ def page_login_form():
     # quando clicar no botão "Atualizar", no assosciado_atualiza
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf)
-        query_cpf = db.engine.execute(f"SELECT CPF, STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
-        get_status = query_cpf.fetchone()
+        print(cpf_without_mask)
+        query_cpf = db.engine.execute(f"SELECT CPF FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
+        # get_status = query_cpf.fetchone()
+        # print(get_status[0])
 
-        if (get_status[0]):
+        if (query_cpf.fetchone()):
+            query_status = db.engine.execute(f"SELECT STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
+            get_status = query_status.fetchone()
+
             encontrou_cpf = f"Foi encontrado o CPF {request.form.get('cpf')} no sistema"
 
-            if not(get_status[1]):
+            if not(get_status[0]):
                 flash(f'{encontrou_cpf}, mas a conta está desativada. Se deseja ativar, falar com a diretoria.')
             else:
                 flash(f'{encontrou_cpf}.')
@@ -380,7 +385,7 @@ def page_login_form():
             db.session.commit()
             return redirect(url_for('page_login_access'))
 
-    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'))
+    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
     # http://jsfiddle.net/XH42p/
 
 

@@ -55,14 +55,46 @@
             <label for="">Endereço completo:</label>
             <input type="text" class="p-2 form-control" name="endereco" placeholder="" value="{{associado.endereco}}" required>
         </div>
-        <div class="mb-3">
-            <label for="">Cidade:</label>
-            <input type="text" class="p-2 form-control" name="cidade" placeholder="" value="{{associado.cidade}}" required>
+        <div class="row g-4 mb-3">
+            <div class="col-auto">
+                <label for="">UF:</label>
+                <select name="uf" class="form-select" required>
+                    <!-- <option selected></option> -->
+                    {% for lista_uf in unidade_federativa %}
+                        {% if associado.uf == lista_uf %}
+                            <option selected value="{{lista_uf}}">{{lista_uf}}</option>
+                        {% else %}
+                            <option value="{{lista_uf}}">{{lista_uf}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-8">
+                <label for="">Cidade:</label>
+                <select name="cidade" class="form-select" required>
+                    {% for lista_uf in unidade_federativa %}
+                        {% if associado.uf == lista_uf %}
+                            {% for cidade in cidades_pr %}
+                                {% if associado.cidade == cidade %}
+                                    <option selected data-uf="{{associado.uf}}" value="{{cidade}}">{{cidade}}</option>
+                                {% else %}
+                                    <option data-uf="{{associado.uf}}" value="{{cidade}}">{{cidade}}</option>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    
+
+                    <!-- {% for lista in cidades_sc %}
+                        <option data-uf="SC" value="{{lista}}">{{lista}}</option>
+                    {% endfor %}
+                    {% for lista in cidades_rs %}
+                        <option data-uf="RS" value="{{lista}}">{{lista}}</option>
+                    {% endfor %} -->
+                </select>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="">UF:</label>
-            <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR, SP" value="{{associado.uf}}" required>
-        </div>
+
         <div class="mb-3">
             <label for="">Telefone/Celular:</label>
             <input type="text" id="telefone" class="p-2 form-control" name="telefone" placeholder="telefone" value="{{associado.telefone}}" required>

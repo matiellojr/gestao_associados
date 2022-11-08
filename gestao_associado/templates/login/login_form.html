@@ -79,10 +79,16 @@
                     </div>
                     <div class="col-8">
                         <label for="">Cidade:</label>
-                        <select name="uf" class="form-select" required>
+                        <select name="cidade" class="form-select" required>
                             <option selected></option>
                             {% for lista in cidades_pr %}
-                                <option value="{{lista}}">{{lista}}</option>
+                                <option data-uf="PR" value="{{lista}}">{{lista}}</option>
+                            {% endfor %}
+                            {% for lista in cidades_sc %}
+                                <option data-uf="SC" value="{{lista}}">{{lista}}</option>
+                            {% endfor %}
+                            {% for lista in cidades_rs %}
+                                <option data-uf="RS" value="{{lista}}">{{lista}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -140,6 +146,7 @@
 </body>
 
 <script type="text/javascript" src="../../static/js/mask_input.js" rel="stylesheet" ></script>
+<script type="text/javascript" src="../../static/js/select_cidade.js" rel="stylesheet" ></script>
 
 </html>
     

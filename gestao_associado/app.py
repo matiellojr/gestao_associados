@@ -288,15 +288,19 @@ def page_mensalidade_form():
     query_mensalidade = db.engine.execute("SELECT * FROM MENSALIDADE;")
     query_count_mensalidade = db.engine.execute("SELECT COUNT(*) FROM MENSALIDADE;")
 
+    isMensal = bool(True)
     data_pagamento = request.form.get('data_pagamento')
     data_vencimento = request.form.get('data_vencimento')
     valor_mensalidade = request.form.get('valor_mensalidade')
+    mensalidade_mensal = request.form.get('tipo_mensalidade')
 
     if (request.method == 'POST'):
         get_id = query_count_mensalidade.fetchone()
         get_last_id = get_id[0] + 1
+        # print(f'>>> POST MENSAL >> {mensal}')
+        print(f'>>> POST TIPO   >> {mensalidade_mensal}')
         
-        if (request.form.get('tipo_mensalidade')):
+        if (mensalidade_mensal == True):
             ehMensal = True
         else:
             ehMensal = False
@@ -307,7 +311,7 @@ def page_mensalidade_form():
         flash(f"Mensalidade cadastrada!", "success")
         return redirect(url_for('page_mensalidade_form'))
 
-    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade)
+    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, ehMensal = isMensal)
 
 
 # --------------------------------------------------------------

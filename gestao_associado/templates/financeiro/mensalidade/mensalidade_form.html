@@ -22,11 +22,11 @@
             padding-right: 10px;">Tipo de Mensalidade:</label>
             <br>   
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{mensalidade.ehMensal}}">
+                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{ehMensal}}">
                 <label class="form-check-label" for="inlineRadio1">Mensal</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{not(mensalidade.ehMensal)}}">
+                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{not(ehMensal)}}">
                 <label class="form-check-label" for="inlineRadio2">Anual</label>
             </div>
         </div>
@@ -46,8 +46,7 @@
 
         <div class="mb-3">
             <button class="btn btn-primary fw-bold">Adicionar</button>
-        </div>
-        
+        </div>  
     </form>
 </div>
 {% endblock conteudo %}

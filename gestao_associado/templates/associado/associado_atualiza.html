@@ -72,25 +72,12 @@
             <div class="col-8">
                 <label for="">Cidade:</label>
                 <select name="cidade" class="form-select" required>
-                    {% for lista_uf in unidade_federativa %}
-                        {% if associado.uf == lista_uf %}
-                            {% for cidade in cidades_pr %}
-                                {% if associado.cidade == cidade %}
-                                    <option selected data-uf="{{associado.uf}}" value="{{cidade}}">{{cidade}}</option>
-                                {% else %}
-                                    <option data-uf="{{associado.uf}}" value="{{cidade}}">{{cidade}}</option>
-                                {% endif %}
-                            {% endfor %}
+                    <option selected></option>
+                    {% for cities_pr in cidades_pr %}
+                        {% if associado.cidade == cities_pr %}
+                            <option selected data-uf="PR" value="{{city_pr}}">{{city_pr}}</option>
                         {% endif %}
                     {% endfor %}
-                    
-
-                    <!-- {% for lista in cidades_sc %}
-                        <option data-uf="SC" value="{{lista}}">{{lista}}</option>
-                    {% endfor %}
-                    {% for lista in cidades_rs %}
-                        <option data-uf="RS" value="{{lista}}">{{lista}}</option>
-                    {% endfor %} -->
                 </select>
             </div>
         </div>

@@ -293,25 +293,28 @@ def page_mensalidade_form():
     data_vencimento = request.form.get('data_vencimento')
     valor_mensalidade = request.form.get('valor_mensalidade')
     mensalidade_mensal = request.form.get('tipo_mensalidade')
+    # mensalidade_anual = not(bool(request.form.get('tipo_mensalidade')))
 
     if (request.method == 'POST'):
         get_id = query_count_mensalidade.fetchone()
         get_last_id = get_id[0] + 1
-        # print(f'>>> POST MENSAL >> {mensal}')
-        print(f'>>> POST TIPO   >> {mensalidade_mensal}')
-        
-        if (mensalidade_mensal == True):
-            ehMensal = True
+        print(f'>> POST TIPO MENSAL >> {(mensalidade_mensal)}')
+        # se o tipo for mensal, recebe True;
+        if bool(mensalidade_mensal):
+            Mensal = mensalidade_mensal
         else:
-            ehMensal = False
+            # senão (se for anual) recebe false
+            Mensal = mensalidade_mensal
 
-        get_mensalidade = mensalidade(get_last_id, ehMensal, data_pagamento, data_vencimento, valor_mensalidade)
-        db.session.add(get_mensalidade)
+        db.engine.execute(
+            f"""
+                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_PAGAMENTO, DATA_VENCIMENTO, VALOR_MENSALIDADE) VALUES({get_last_id}, {Mensal}, '{data_pagamento}', '{data_vencimento}', {valor_mensalidade});
+            """)
         db.session.commit()
         flash(f"Mensalidade cadastrada!", "success")
         return redirect(url_for('page_mensalidade_form'))
 
-    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, ehMensal = isMensal)
+    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = isMensal)
 
 
 # --------------------------------------------------------------

@@ -4,29 +4,29 @@
 <hr>
 
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class=flashes>
-            <div class="alert alert-success text-center" role="alert">
-                {% for message in messages %}
-                    <h4>{{ message }}</h4>  
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
+{% if messages %}
+<div class=flashes>
+    <div class="alert alert-success text-center" role="alert">
+        {% for message in messages %}
+        <h4>{{ message }}</h4>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endwith %}
 
 <div>
-    <form action="{{url_for('page_mensalidade_form')}}" method='POST' class="form-control p-5" >
+    <form action="{{url_for('page_mensalidade_form')}}" method='POST' class="form-control p-5">
         <div class="mb-3">
             <label class="fw-bold px-10" style="
             padding-right: 10px;">Tipo de Mensalidade:</label>
-            <br>   
+            <br>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{ehMensal}}">
+                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{eh_Mensal}}">
                 <label class="form-check-label" for="inlineRadio1">Mensal</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{not(ehMensal)}}">
+                <input class="form-check-input" type="radio" name="tipo_mensalidade" value="{{not(eh_Mensal)}}">
                 <label class="form-check-label" for="inlineRadio2">Anual</label>
             </div>
         </div>
@@ -46,9 +46,7 @@
 
         <div class="mb-3">
             <button class="btn btn-primary fw-bold">Adicionar</button>
-        </div>  
+        </div>
     </form>
 </div>
 {% endblock conteudo %}
-    
-    

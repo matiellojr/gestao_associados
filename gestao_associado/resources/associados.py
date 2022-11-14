@@ -17,6 +17,7 @@ class Associado():
 
 
     @app.route('/<int:id>/associado_atualiza' , methods=["GET", "POST"])
+    # mesmo sendo get ou post vc vai retornar uma pagina html e não um json
     def page_associado_atualiza(id):
         query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
         query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')

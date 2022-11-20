@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
-import sqlalchemy.orm as orm
+from sqlalchemy.orm import relationship
 # https://github.com/Sidon/py-ufbr
 from pyUFbr.baseuf import ufbr
 import sqlalchemy as sa
@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
-class associado(db.Model):
+class associados(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
     data_cadastro = sa.Column(sa.Date)
     data_atualizada = sa.Column(sa.Date)
@@ -29,14 +29,14 @@ class associado(db.Model):
     email = sa.Column(sa.String(200))
     data_nascimento = sa.Column(sa.Date)
     telefone = sa.Column(sa.String(30))
+    estado_civil = sa.Column(sa.String(50))
+    como_identifica = sa.Column(sa.String())
     situacao_trabalho = sa.Column(sa.String(50))
+    tipo_sanguineo = sa.Column(sa.String(3))
     quantidades_filhos = sa.Column(sa.Integer)
     status_associado = sa.Column(sa.Boolean)
-    estado_civil = orm.relationship('estado_civil', back_populates='associado', lazy='joined')
-    tipo_sanguineo = orm.relationship('tipos_sanguineo', back_populates='associado', lazy='joined')
-    como_identifica = orm.relationship('identificacao', back_populates='associado', lazy='joined')
 
-    def __init__(self, id, cpf, nome_completo, endereco, data_cadastro, cidade, uf,  email, data_nascimento, data_atualizada, telefone, situacao_trabalho, quantidades_filhos, status_associado, estado_civil, tipo_sanguineo, como_identifica):
+    def __init__(self, id, cpf, nome_completo, endereco, data_cadastro, cidade, uf,  email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, status_associado):
         self.id = id
         self.data_cadastro = data_cadastro
         self.data_atualizada = data_atualizada
@@ -46,29 +46,26 @@ class associado(db.Model):
         self.cidade = cidade
         self.uf = uf
         self.email = email
+        self.tipo_sanguineo = tipo_sanguineo
         self.data_nascimento = data_nascimento
         self.telefone = telefone
+        self.estado_civil = estado_civil
         self.situacao_trabalho = situacao_trabalho
+        self.como_identifica = como_identifica
         self.quantidades_filhos = quantidades_filhos
         self.status_associado = status_associado
-        self.estado_civil = estado_civil
-        self.tipo_sanguineo = tipo_sanguineo
-        self.como_identifica = como_identifica
 
 
 class tipos_sanguineo(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
-    tipo = sa.Column(sa.String(3))
-    associado_id = sa.Column(sa.Integer, sa.ForeignKey('associado.id'))
+    tipos = sa.Column(sa.String(3))
 
-    def __init__(self, tipo):
-        self.tipo = tipo
-        
+    def __init__(self, tipos):
+        self.tipos = tipos
 
 class identificacao(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
     tipo = sa.Column(sa.String(30))
-    associado_id = sa.Column(sa.Integer, sa.ForeignKey('associado.id'))
 
     def __init__(self, tipo):
         self.tipo = tipo
@@ -76,7 +73,6 @@ class identificacao(db.Model):
 class estado_civil(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
     tipo = sa.Column(sa.String(30))
-    associado_id = sa.Column(sa.Integer, sa.ForeignKey('associado.id'))
 
     def __init__(self, tipo):
         self.tipo = tipo
@@ -93,45 +89,45 @@ def execute_insert():
     # busca uma linha > tem_tipos_sanguineos.fetchone()
     # busca todas as linhas > tem_tipos_sanguineos.fetchall() 
     # busca todas as linhas, cada linha tem um dicionário com os nomes dos campos > tem_tipos_sanguineos.dictfetchall() 
-    # tem_tipos_sanguineos = db.engine.execute('SELECT 1 FROM tipos_sanguineo;')
-    # tem_identificacao = db.engine.execute('SELECT 1 FROM identificacao;')
-    # tem_estado_civil = db.engine.execute('SELECT 1 FROM ESTADO_CIVIL;')
+    tem_tipos_sanguineos = db.engine.execute('SELECT 1 FROM tipos_sanguineo;')
+    tem_identificacao = db.engine.execute('SELECT 1 FROM identificacao;')
+    tem_estado_civil = db.engine.execute('SELECT 1 FROM ESTADO_CIVIL;')
     tem_status_pagamento = db.engine.execute('SELECT 1 FROM STATUS_PAGAMENTO;')
     
-    # if not(tem_tipos_sanguineos.fetchone()):
-    #     db.engine.execute('''
-    #         INSERT INTO tipos_sanguineo VALUES (1, 'A+');
-    #         INSERT INTO tipos_sanguineo VALUES (2, 'B+');
-    #         INSERT INTO tipos_sanguineo VALUES (3, 'AB+');
-    #         INSERT INTO tipos_sanguineo VALUES (4, 'O+');
-    #         INSERT INTO tipos_sanguineo VALUES (5, 'A-');
-    #         INSERT INTO tipos_sanguineo VALUES (6, 'B-');
-    #         INSERT INTO tipos_sanguineo VALUES (7, 'AB-');
-    #         INSERT INTO tipos_sanguineo VALUES (8, 'O-');
-    #     ''')
-    # else:
-    #     print('Os dados da tabela do Tipo de Sanguíneos já está inserido!')
+    if not(tem_tipos_sanguineos.fetchone()):
+        db.engine.execute('''
+            INSERT INTO tipos_sanguineo VALUES (1, 'A+');
+            INSERT INTO tipos_sanguineo VALUES (2, 'B+');
+            INSERT INTO tipos_sanguineo VALUES (3, 'AB+');
+            INSERT INTO tipos_sanguineo VALUES (4, 'O+');
+            INSERT INTO tipos_sanguineo VALUES (5, 'A-');
+            INSERT INTO tipos_sanguineo VALUES (6, 'B-');
+            INSERT INTO tipos_sanguineo VALUES (7, 'AB-');
+            INSERT INTO tipos_sanguineo VALUES (8, 'O-');
+        ''')
+    else:
+        print('Os dados da tabela do Tipo de Sanguíneos já está inserido!')
 
-    # if not(tem_identificacao.fetchone()):
-    #     db.engine.execute('''
-    #         INSERT INTO IDENTIFICACAO VALUES (1, 'Surdo');
-    #         INSERT INTO IDENTIFICACAO VALUES (2, 'Surdocego');
-    #         INSERT INTO IDENTIFICACAO VALUES (3, 'Deficiência Auditiva (DA)');
-    #         INSERT INTO IDENTIFICACAO VALUES (4, 'Ouvinte');
-    #     ''')
-    # else:
-    #     print('Os dados da tabela do Identificação já está inserido!')
+    if not(tem_identificacao.fetchone()):
+        db.engine.execute('''
+            INSERT INTO IDENTIFICACAO VALUES (1, 'Surdo');
+            INSERT INTO IDENTIFICACAO VALUES (2, 'Surdocego');
+            INSERT INTO IDENTIFICACAO VALUES (3, 'Deficiência Auditiva (DA)');
+            INSERT INTO IDENTIFICACAO VALUES (4, 'Ouvinte');
+        ''')
+    else:
+        print('Os dados da tabela do Identificação já está inserido!')
 
-    # if not(tem_estado_civil.fetchone()):
-    #     db.engine.execute('''
-    #         INSERT INTO ESTADO_CIVIL VALUES (1, 'Solteiro');
-    #         INSERT INTO ESTADO_CIVIL VALUES (2, 'Casado');
-    #         INSERT INTO ESTADO_CIVIL VALUES (3, 'Separado');
-    #         INSERT INTO ESTADO_CIVIL VALUES (4, 'Divorciado');
-    #         INSERT INTO ESTADO_CIVIL VALUES (5, 'Viúvo');
-    #     ''')
-    # else:
-    #     print('Os dados da tabela do Estado Civil já está inserido!')
+    if not(tem_estado_civil.fetchone()):
+        db.engine.execute('''
+            INSERT INTO ESTADO_CIVIL VALUES (1, 'Solteiro');
+            INSERT INTO ESTADO_CIVIL VALUES (2, 'Casado');
+            INSERT INTO ESTADO_CIVIL VALUES (3, 'Separado');
+            INSERT INTO ESTADO_CIVIL VALUES (4, 'Divorciado');
+            INSERT INTO ESTADO_CIVIL VALUES (5, 'Viúvo');
+        ''')
+    else:
+        print('Os dados da tabela do Estado Civil já está inserido!')
 
     if not(tem_status_pagamento.fetchone()):
         db.engine.execute('''
@@ -154,7 +150,7 @@ def page_principal():
 
 @app.route('/associado_lista')
 def page_associado_lista():
-    query_lista = db.engine.execute("SELECT * FROM associado ORDER BY ID;")
+    query_lista = db.engine.execute("SELECT * FROM associados ORDER BY ID;")
     return render_template("associado/associado_lista.html", lista_associados = query_lista)
 
 
@@ -204,7 +200,7 @@ def page_associado_lista():
 def page_associado_atualiza(id):
     query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
     query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
-    query_associado = db.engine.execute(f"SELECT * FROM ASSOCIADO WHERE ID = {id} ORDER BY ID;")
+    query_associados = db.engine.execute(f"SELECT * FROM ASSOCIADOS WHERE ID = {id} ORDER BY ID;")
     query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
 
 
@@ -240,12 +236,12 @@ def page_associado_atualiza(id):
 
             db.engine.execute(
                 f"""
-                    UPDATE ASSOCIADO SET DATA_CADASTRO='{data_cadastro}', DATA_ATUALIZADA='{data_atualizada}', CPF='{cpf}', NOME_COMPLETO='{nome_completo}', ENDERECO='{endereco}', CIDADE='{cidade}', UF='{uf}', EMAIL='{email}', DATA_NASCIMENTO='{data_nascimento}', TELEFONE='{telefone}', ESTADO_CIVIL='{estado_civil}', como_identifica='{como_identifica}', SITUACAO_TRABALHO='{situacao_trabalho}', TIPO_SANGUINEO='{tipo_sanguineo}', QUANTIDADES_FILHOS={quantidades_filhos}, STATUS_ASSOCIADO={status_associado} WHERE ID={id};
+                    UPDATE ASSOCIADOS SET DATA_CADASTRO='{data_cadastro}', DATA_ATUALIZADA='{data_atualizada}', CPF='{cpf}', NOME_COMPLETO='{nome_completo}', ENDERECO='{endereco}', CIDADE='{cidade}', UF='{uf}', EMAIL='{email}', DATA_NASCIMENTO='{data_nascimento}', TELEFONE='{telefone}', ESTADO_CIVIL='{estado_civil}', como_identifica='{como_identifica}', SITUACAO_TRABALHO='{situacao_trabalho}', TIPO_SANGUINEO='{tipo_sanguineo}', QUANTIDADES_FILHOS={quantidades_filhos}, STATUS_ASSOCIADO={status_associado} WHERE ID={id};
                 """)
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_atualiza.html", _query_associados = query_associado, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
+    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
 
 
 # --------------------------------------------
@@ -259,7 +255,7 @@ class mensalidade(db.Model):
     data_pagamento = sa.Column(sa.Date)
     data_vencimento = sa.Column(sa.Date)
     valor_mensalidade = sa.Column(sa.Float)
-    id_pagamento = orm.relationship("pagamento", back_populates="mensalidade", lazy = 'joined')
+    # id_pagamento = relationship("pagamento", back_populates="mensalidade", lazy = True)
 
     def __init__(self, id, ehMensal, data_pagamento, data_vencimento, valor_mensalidade):
         self.id = id
@@ -276,15 +272,15 @@ class pagamento(db.Model):
     comprovante_pagamento = sa.Column(sa.String)
     status_pagamento = sa.Column(sa.String)
     pagamento_confirmado = sa.Column(sa.Boolean)
-    mensalidade_id = sa.Column(sa.Integer, sa.ForeignKey("mensalidade.id"))
+    # mensalidade_id = sa.Column(sa.Integer, sa.ForeignKey("mensalidade.id"))
 
-    def __init__(self, data_pagamento, valor_pagamento, status_pagamento, pagamento_confirmado, comprovante_pagamento, mensalidade_id):
+    def __init__(self, data_pagamento, valor_pagamento, status_pagamento, pagamento_confirmado, comprovante_pagamento):
         self.data_pagamento = data_pagamento
         self.valor_pagamento = valor_pagamento
         self.status_pagamento = status_pagamento
         self.pagamento_confirmado = pagamento_confirmado
         self.comprovante_pagamento = comprovante_pagamento
-        self.mensalidade_id = mensalidade_id
+        # self.mensalidade_id = mensalidade_id
 
 
 @app.route('/mensalidade_form' , methods=["GET", "POST"])
@@ -297,15 +293,17 @@ def page_mensalidade_form():
     data_vencimento = request.form.get('data_vencimento')
     valor_mensalidade = request.form.get('valor_mensalidade')
     mensalidade_mensal = request.form.get('tipo_mensalidade')
+    # mensalidade_anual = not(bool(request.form.get('tipo_mensalidade')))
 
     if (request.method == 'POST'):
         get_id = query_count_mensalidade.fetchone()
         get_last_id = get_id[0] + 1
-
+        print(f'>> POST TIPO MENSAL >> {(mensalidade_mensal)}')
         # se o tipo for mensal, recebe True;
         if bool(mensalidade_mensal):
             Mensal = mensalidade_mensal
         else:
+            # senão (se for anual) recebe false
             Mensal = mensalidade_mensal
 
         db.engine.execute(
@@ -340,10 +338,10 @@ def page_login_access():
 
 @app.route('/login_form', methods=["GET", "POST"])
 def page_login_form():
-    # query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
-    # query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
-    # query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
-    query_quantidade_associados = db.engine.execute("SELECT COUNT(*) FROM ASSOCIADO;")
+    query_tipos_sanguineos = db.engine.execute("SELECT TIPOS FROM TIPOS_SANGUINEO;")
+    query_identificacao = db.engine.execute('SELECT TIPO FROM IDENTIFICACAO;')
+    query_estado_civil = db.engine.execute('SELECT TIPO FROM ESTADO_CIVIL;')
+    query_quantidade_associados = db.engine.execute("SELECT COUNT(*) FROM ASSOCIADOS;")
 
     cpf_login = request.form.get('cpf')
     password_login = request.form.get('password_login')
@@ -356,22 +354,24 @@ def page_login_form():
     email = request.form.get('email')
     uf = request.form.get('uf')
     cidade = request.form.get('cidade')
-    _tipo_sanguineo = request.form.get('tipo_sanguineo')
+    tipo_sanguineo = request.form.get('tipo_sanguineo')
     data_nascimento = request.form.get('data_nascimento')
     telefone = request.form.get('telefone')
-    _estado_civil = request.form.get('estado_civil')
+    estado_civil = request.form.get('estado_civil')
     situacao_trabalho = request.form.get('situacao_trabalho')
-    _como_identifica = request.form.get('como_identifica')
+    como_identifica = request.form.get('como_identifica')
     quantidades_filhos = request.form.get('quantidades_filhos')
     
     # quando clicar no botão "Atualizar", no assosciado_atualiza
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf)
         print(cpf_without_mask)
-        query_cpf = db.engine.execute(f"SELECT CPF FROM ASSOCIADO WHERE CPF = '{cpf_without_mask}';")
+        query_cpf = db.engine.execute(f"SELECT CPF FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
+        # get_status = query_cpf.fetchone()
+        # print(get_status[0])
 
         if (query_cpf.fetchone()):
-            query_status = db.engine.execute(f"SELECT STATUS_ASSOCIADO FROM ASSOCIADO WHERE CPF = '{cpf_without_mask}';")
+            query_status = db.engine.execute(f"SELECT STATUS_ASSOCIADO FROM ASSOCIADOS WHERE CPF = '{cpf_without_mask}';")
             get_status = query_status.fetchone()
 
             encontrou_cpf = f"Foi encontrado o CPF {request.form.get('cpf')} no sistema"
@@ -385,17 +385,14 @@ def page_login_form():
         else:
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
-            
-            insert_associado = associado(get_last_id, cpf_without_mask, nome_completo, endereco, data_cadastro, cidade, uf, email, data_nascimento, data_atualizada, telefone, situacao_trabalho, quantidades_filhos, False, _estado_civil, _tipo_sanguineo, _como_identifica)
-            
-            # table_login = login(get_last_id, cpf_without_mask, password_login)
-            
-            db.session.add(insert_associado)
-            # db.session.add(table_login)
+            associado = associados(get_last_id, cpf_without_mask, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, situacao_trabalho, como_identifica, quantidades_filhos, False)
+            table_login = login(get_last_id, cpf_without_mask, password_login)
+            db.session.add(associado)
+            db.session.add(table_login)
             db.session.commit()
             return redirect(url_for('page_login_access'))
 
-    return render_template("login/login_form.html", data_hoje=date.today(), unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
+    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'))
     # http://jsfiddle.net/XH42p/
 
 

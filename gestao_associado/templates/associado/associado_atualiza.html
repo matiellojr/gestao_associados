@@ -72,10 +72,33 @@
             <div class="col-8">
                 <label for="">Cidade:</label>
                 <select name="cidade" class="form-select" required>
-                    <option selected></option>
+                    <!-- <option selected></option> -->
                     {% for cities_pr in cidades_pr %}
                         {% if associado.cidade == cities_pr %}
                             <option selected data-uf="PR" value="{{cities_pr}}">{{cities_pr}}</option>
+                        {% else %}
+                            <option data-uf="PR" value="{{cities_pr}}">{{cities_pr}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for cities_sc in cidades_sc %}
+                        {% if associado.cidade == cities_sc %}
+                            <option selected data-uf="SC" value="{{cities_sc}}">{{cities_sc}}</option>
+                        {% else %}
+                            <option data-uf="SC" value="{{cities_sc}}">{{cities_sc}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for cities_rs in cidades_rs %}
+                        {% if associado.cidade == cities_rs %}
+                            <option selected data-uf="RS" value="{{cities_rs}}">{{cities_rs}}</option>
+                        {% else %}
+                            <option data-uf="RS" value="{{cities_rs}}">{{cities_rs}}</option>
+                        {% endif %}
+                    {% endfor %}
+                    {% for cities_sp in cidades_sp %}
+                        {% if associado.cidade == cities_sp %}
+                            <option selected data-uf="SP" value="{{cities_sp}}">{{cities_sp}}</option>
+                        {% else %}
+                            <option data-uf="SP" value="{{cities_sp}}">{{cities_sp}}</option>
                         {% endif %}
                     {% endfor %}
                 </select>
@@ -91,10 +114,8 @@
             <label for="">Estado Civil:</label>
             <select name="estado_civil" class="form-select">
                 {% for lista in estado_civil %}
-                    {% if associado.estado_civil == lista.tipo %}
-                        <option selected value="{{lista.tipo}}">{{lista.tipo}}</option>
-                    {% else %}
-                        <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% if associado.id_estado_civil == lista.id %}
+                        <option selected value="{{lista.id}}">{{lista.tipo}} </option>
                     {% endif %}
                 {% endfor %}
             </select>
@@ -104,10 +125,10 @@
             <label for="">Como você se identifica?</label>
             <select name="como_identifica" class="form-select">
                 {% for lista in identificacao %}
-                    {% if associado.como_identifica == lista.tipo %}
-                        <option selected value="{{lista.tipo}}">{{lista.tipo}}</option>
+                    {% if associado.id_identificacao == lista.id %}
+                        <option selected value="{{lista.id}}">{{lista.tipo}}</option>
                     {% else %}
-                        <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                        <option value="{{lista.id}}">{{lista.tipo}}</option>
                     {% endif %}
                 {% endfor %}
             </select>
@@ -123,10 +144,10 @@
             <select name="tipo_sanguineo" class="form-select">
                 <option selected></option>
                 {% for lista_sanguineos in tipos_sanguineos %}
-                    {% if associado.tipo_sanguineo == lista_sanguineos.tipos %}
-                        <option selected value="{{lista_sanguineos.tipos}}">{{lista_sanguineos.tipos}}</option>
+                    {% if associado.id_tipo_sanguineo == lista_sanguineos.id %}
+                        <option selected value="{{lista_sanguineos.id}}">{{lista_sanguineos.tipos}}</option>
                     {% else %}
-                        <option value="{{lista_sanguineos.tipos}}">{{lista_sanguineos.tipos}}</option>
+                        <option value="{{lista_sanguineos.id}}">{{lista_sanguineos.tipos}}</option>
                     {% endif %}
                 {% endfor %}
             </select>

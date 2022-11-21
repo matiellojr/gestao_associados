@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Pagamento</h2>
+<hr>
+
+<div>
+    <form action="{{url_for('page_pagamento_form')}}" method='POST' class="form-control">
+        <div class="mb-3">
+            <label class="fw-bold px-10">Data de Pagamento:</label>
+            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="x" value="" readonly>
+        </div>
+        <label class="fw-bold px-10">Valor de Pagamento:</label>
+        <div class="input-group mb-3">
+            <span class="input-group-text">R$</span>
+            <input type="text" id="money" class="p-2 form-control" name="valor_pagamento" placeholder="0000" required>
+            <span class="input-group-text">.00</span>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold px-10" style="
+            padding-right: 10px;">Pagamento Confirmado:</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="pagamento_confirmado" value="{{_pagamento_confirmado}}">
+                <label class="form-check-label" for="inlineRadio1"></label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Status:</label>
+            <select name="status_pagamento" class="form-select">
+                <option selected></option>
+                {% for lista_status_pagamento in status_pagamento %}
+                    <option value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.situacao}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-success">
+                <i class="bi bi-save"> 
+                    <b>Salvar</b>
+                </i> 
+            </button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock conteudo %}
+

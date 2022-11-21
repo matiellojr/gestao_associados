@@ -90,13 +90,12 @@
                             {% for lista in cidades_rs %}
                                 <option data-uf="RS" value="{{lista}}">{{lista}}</option>
                             {% endfor %}
+                            {% for lista in cidades_sp %}
+                                <option data-uf="SP" value="{{lista}}">{{lista}}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
-                <!-- <div class="mb-3">
-                    <label for="">UF:</label>
-                    <input type="text" class="p-2 form-control" name="uf" placeholder="SC, PR..." required>
-                </div> -->
                 <div class="mb-3">
                     <label for="">Telefone/Celular:</label>
                     <input type="text" id="telefone" class="p-2 form-control" name="telefone" placeholder="(00) 0 0000-0000" required>
@@ -106,7 +105,7 @@
                     <select name="estado_civil" class="form-select">
                         <option selected></option>
                         {% for lista in estado_civil %}
-                            <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                            <option value="{{lista.id}}">{{lista.tipo}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -114,8 +113,8 @@
                     <label for="">Como você se identifica?</label>
                     <select name="como_identifica" class="form-select">
                         <option selected></option>
-                        {% for lista in identificacao %}
-                            <option value="{{lista.tipo}}">{{lista.tipo}}</option>
+                        {% for lista_identificacao in identificacao %}
+                            <option selected value="{{lista_identificacao.id}}">{{lista_identificacao.tipo}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -128,7 +127,7 @@
                     <select name="tipo_sanguineo" class="form-select">
                         <option selected></option>
                         {% for lista in tipos %}
-                            <option value="{{lista.tipos}}">{{lista.tipos}}</option>
+                            <option value="{{lista.id}}">{{lista.tipos}}</option>
                         {% endfor %}
                     </select>
                 </div>

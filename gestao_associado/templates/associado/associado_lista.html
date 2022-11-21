@@ -17,8 +17,11 @@
                 <th>{{lista.id}}</th>
                 <td>{{lista.nome_completo}}</td>
                 <td>
-                    <a href="{{lista.id}}/associado_atualiza" class="btn btn-secondary btn-xs">
+                    <a href="{{lista.id}}/associado_atualiza" class="btn btn-warning btn-xs">
                         <i class="bi bi-pencil"> Editar</i>
+                    </a>
+                    <a href="{{url_for('page_pagamento_form')}}"  class="btn btn-success btn-xs">
+                        <i class="bi bi-currency-dollar"> Mensalidade</i>
                     </a>
                 </td>
             </tr>

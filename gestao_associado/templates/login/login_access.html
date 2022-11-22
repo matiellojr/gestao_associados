@@ -27,10 +27,10 @@
         </div>
         {% endif %}
     {% endwith %}
-    <form>
+    <form action="{{url_for('page_login_access')}}" method='POST'>
         <div class="container postion-fixed area">
             <div class="p-5 col-9 col-sm-6 bg-dark bg-gradient bg-opacity-75 position-absolute top-50 start-50 translate-middle" style="border: solid rgba(255, 255, 255, 0.329);">
-                <form action="{{url_for('page_login_access')}}" method='POST' class="form-control p-5">
+                <form action="{{url_for('page_login_access')}}" class="form-control p-5">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <a href="{{url_for('page_login_form')}}" class="mb-3 btn btn-success me-md-2">
                             <b>Cadastrar</b>
@@ -39,20 +39,22 @@
 
                     <div>
                         <div class="form-floating mb-3 ">
-                            <input type="text" class="form-control" name="cpf_login" id="cpf">
+                            <input type="text" class="form-control" name="cpf_login" id="cpf" required>
                             <label for="floatingInput">CPF:</label>
                         </div>
                         <div class="form-floating">
-                            <input type="password" class="form-control" name="password_login" id="floatingPassword" placeholder="passoword">
+                            <input type="password" class="form-control" name="password_login" id="floatingPassword" placeholder="passoword" required>
                             <label for="floatingPassword">Senha:</label>
                         </div>            
                     </div>
 
                     <div class="row">
                         <div class="col p-3 mt-3 text-center">
-                            <a href="{{url_for('page_principal')}}" class="mb-3 ml-2 btn btn-primary">
-                                <b>Entrar</b>
-                            </a>
+                            <div class="mb-3">
+                                <button class="btn btn-primary">
+                                    <b>Acessar</b>
+                                </button>
+                            </div>
                             <a href="{{url_for('page_login_auth_forgot_password')}}" class="mb-3 btn btn-danger">
                                 <b>Esqueceu a senha?</b>
                             </a>

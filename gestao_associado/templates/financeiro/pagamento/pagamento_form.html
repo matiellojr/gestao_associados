@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<h2 class="pt-3 text-center">Pagamento</h2>
+<h2 class="pt-3 text-center">Pagamento de Mensalidade</h2>
 <hr>
 
 <div>
     <form action="{{url_for('page_pagamento_form')}}" method='POST' class="form-control">
         <div class="mb-3">
             <label class="fw-bold px-10">Data de Pagamento:</label>
-            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="x" value="" readonly>
+            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="x" value="data_pagamento">
         </div>
         <label class="fw-bold px-10">Valor de Pagamento:</label>
         <div class="input-group mb-3">
@@ -28,7 +28,7 @@
             <select name="status_pagamento" class="form-select">
                 <option selected></option>
                 {% for lista_status_pagamento in status_pagamento %}
-                    <option value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.situacao}}</option>
+                    <option value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.status}}</option>
                 {% endfor %}
             </select>
         </div>

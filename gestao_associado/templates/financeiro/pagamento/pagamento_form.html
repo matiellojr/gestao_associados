@@ -4,10 +4,19 @@
 <hr>
 
 <div>
-    <form action="{{url_for('page_pagamento_form')}}" method='POST' class="form-control">
+    {% for lista in query_Men_Ass_Pag %}
+    <form action="{{url_for('page_pagamento_form', id = lista[2])}}" method='POST' class="form-control">    
+        <div class="mb-3">
+            <label class="fw-bold px-10">Associado:</label>
+            <input type="text" class="p-2 form-control" name="nome_associado" placeholder="" value="{{lista[1]}}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold px-10">Data vencimento:</label>
+            <input type="date" class="p-2 form-control" name="nome_associado" placeholder="" value="{{lista.data_vencimento}}" disabled>
+        </div>
         <div class="mb-3">
             <label class="fw-bold px-10">Data de Pagamento:</label>
-            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="x" value="data_pagamento">
+            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="x" value="{{date_today}}">
         </div>
         <label class="fw-bold px-10">Valor de Pagamento:</label>
         <div class="input-group mb-3">
@@ -16,22 +25,15 @@
             <span class="input-group-text">.00</span>
         </div>
         <div class="mb-3">
-            <label class="fw-bold px-10" style="
-            padding-right: 10px;">Pagamento Confirmado:</label>
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="pagamento_confirmado" value="{{_pagamento_confirmado}}">
-                <label class="form-check-label" for="inlineRadio1"></label>
-            </div>
-        </div>
-        <div class="mb-3">
             <label class="fw-bold">Status:</label>
             <select name="status_pagamento" class="form-select">
                 <option selected></option>
-                {% for lista_status_pagamento in status_pagamento %}
+                {% for lista_status_pagamento in query_status_pagamento %}
                     <option value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.status}}</option>
                 {% endfor %}
             </select>
         </div>
+        
 
         <div class="mb-3">
             <button class="btn btn-success">
@@ -41,6 +43,7 @@
             </button>
         </div>
     </form>
+    {% endfor %}
 </div>
 
 

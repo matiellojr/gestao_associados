@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<h2 class="pt-3 text-center">Lista de Associados Database</h2>
+<h2 class="pt-3 text-center">Lista de Associados</h2>
 <hr>
 
 <table class="table table-bordered table-hover">
@@ -19,9 +19,6 @@
                 <td>
                     <a href="{{lista.id}}/associado_atualiza" class="btn btn-warning btn-xs">
                         <i class="bi bi-pencil"> Editar</i>
-                    </a>
-                    <a href="{{url_for('page_pagamento_form')}}"  class="btn btn-success btn-xs">
-                        <i class="bi bi-currency-dollar"> Pagamento</i>
                     </a>
                 </td>
             </tr>

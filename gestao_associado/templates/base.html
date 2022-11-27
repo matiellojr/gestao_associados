@@ -28,14 +28,24 @@
                     <a class="nav-link" aria-current="page" href="{{url_for('page_principal')}}">Home</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('page_associado_lista')}}">Associados Database</a>
+                    <a class="nav-link" href="{{url_for('page_associado_lista')}}">Associados</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('page_mensalidade_form')}}">Mensalidade</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Mensalidade
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{{url_for('page_mensalidade_form')}}">Cadastro</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{{url_for('page_mensalidade_lista')}}">Consulta</a></li>
+                    </a>               
+                    </ul>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('page_login_access')}}">login?</a>
-                  </li>
+                </a>
+
+                <li class="nav-item">
+                  <a class="nav-link" href="{{url_for('page_login_access')}}">login?</a>
+                </li>
                 </ul>
               </div>
             </div>

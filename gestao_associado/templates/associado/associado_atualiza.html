@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<h2 class="pt-3 text-center">Atualização de Associado</h2>
+<h2 class="pt-3 text-center">Consulta de Associado</h2>
 <hr>
 
 {% with messages = get_flashed_messages() %}
@@ -24,7 +24,7 @@
                     {% if associado.id_status_associado == lista_status.id %}
                         <option selected value="{{lista_status.id}}">{{lista_status.status}}</option>
                     {% else %}
-                    <option value="{{lista_status.id}}">{{lista_status.status}}</option>
+                        <option value="{{lista_status.id}}">{{lista_status.status}}</option>
                     {% endif %}
                 {% endfor %}
             </select>

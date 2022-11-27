@@ -118,16 +118,16 @@ class tipo_login(db.Model):
 class mensalidade(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
     ehMensal = sa.Column(sa.Boolean)
-    data_pagamento = sa.Column(sa.Date)
+    data_mensalidade = sa.Column(sa.Date)
     data_vencimento = sa.Column(sa.Date)
     valor_mensalidade = sa.Column(sa.Float)
     id_associado = sa.Column(sa.Integer, sa.ForeignKey('associado.id')) 
     id_status_mensalidade = sa.Column(sa.Integer, sa.ForeignKey('status_mensalidade.id'))
 
-    def __init__(self, id, ehMensal, data_pagamento, data_vencimento, valor_mensalidade, id_associado, id_status_mensalidade):
+    def __init__(self, id, ehMensal, data_mensalidade,  data_vencimento, valor_mensalidade, id_associado, id_status_mensalidade):
         self.id = id
         self.ehMensal = ehMensal
-        self.data_pagamento = data_pagamento
+        self.data_mensalidade = data_mensalidade
         self.data_vencimento = data_vencimento
         self.valor_mensalidade = valor_mensalidade
         self.id_associado = id_associado
@@ -142,11 +142,10 @@ class pagamento(db.Model):
     id_status_pagamento = sa.Column(sa.Integer, sa.ForeignKey('status_pagamento.id'))
     id_mensalidade = sa.Column(sa.Integer, sa.ForeignKey('mensalidade.id')) 
 
-    def __init__(self, id, data_pagamento, valor_pagamento, pagamento_confirmado,id_status_pagamento, id_mensalidade):
+    def __init__(self, id, data_pagamento, valor_pagamento,id_status_pagamento, id_mensalidade):
         self.id = id
         self.data_pagamento = data_pagamento
         self.valor_pagamento = valor_pagamento
-        self.pagamento_confirmado = pagamento_confirmado
         self.id_status_pagamento = id_status_pagamento
         self.id_mensalidade = id_mensalidade
 
@@ -220,7 +219,7 @@ def execute_insert():
 
     if not(tem_status_mensalidade.fetchone()):
         db.engine.execute('''
-            INSERT INTO status_mensalidade VALUES (1, 'Ainda falta pagar');
+            INSERT INTO status_mensalidade VALUES (1, 'Ainda falta pagar!');
             INSERT INTO status_mensalidade VALUES (2, 'Pago');
             INSERT INTO status_mensalidade VALUES (3, 'Não pago');
         ''')
@@ -294,22 +293,43 @@ def page_associado_atualiza(id):
     return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'), cidades_sp = ufbr.list_cidades(sigla='SP'))
 
 
+# --------------------------------------------------
+#     Mensalidade
+# --------------------------------------------------
+@app.route('/mensalidade_lista')
+def page_mensalidade_lista():
+    query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;")
+    query_lista = db.engine.execute('''
+        SELECT A.ID, A.NOME_COMPLETO, M.*, P.*, ST.*  FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        LEFT JOIN STATUS_PAGAMENTO ST ON (ST.ID = P.ID_STATUS_PAGAMENTO)
+        ORDER BY M.DATA_VENCIMENTO ASC;
+    ''')
+
+    return render_template("financeiro/mensalidade/mensalidade_lista.html", lista_mensalidades_associado = query_lista, query_status_pagamento = query_status_pagamento)
 
 
 @app.route('/mensalidade_form' , methods=["GET", "POST"])
 def page_mensalidade_form():
     isMensal = bool(True)
     query_mensalidade = db.engine.execute("SELECT * FROM MENSALIDADE;")
-    query_count_mensalidade = db.engine.execute("SELECT COUNT(*) FROM MENSALIDADE;")
+    query_count_mensalidade = db.engine.execute("SELECT MAX(ID) FROM MENSALIDADE;")
+    query_associados = db.engine.execute("SELECT ID, NOME_COMPLETO FROM ASSOCIADO WHERE ID_STATUS_ASSOCIADO = 1 ORDER BY 2;")
 
-    data_pagamento = request.form.get('data_pagamento')
+    data_mensalidade = request.form.get('data_mensalidade')
     data_vencimento = request.form.get('data_vencimento')
     valor_mensalidade = request.form.get('valor_mensalidade')
     mensalidade_mensal = request.form.get('tipo_mensalidade')
+    id_associado = request.form.get('id_nome_associado')
+
 
     if (request.method == 'POST'):
         get_id = query_count_mensalidade.fetchone()
-        get_last_id = get_id[0] + 1
+        if (get_id[0] == None):
+            get_last_id = 1
+        else:
+            get_last_id = get_id[0] + 1
 
         # se o tipo for mensal, recebe True;
         if bool(mensalidade_mensal):
@@ -317,41 +337,78 @@ def page_mensalidade_form():
         else:
             # senão (se for anual) recebe false
             Mensal = mensalidade_mensal
+            
 
         db.engine.execute(
             f"""
-                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_PAGAMENTO, DATA_VENCIMENTO, VALOR_MENSALIDADE) VALUES({get_last_id}, {Mensal}, '{data_pagamento}', '{data_vencimento}', {valor_mensalidade});
+                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_MENSALIDADE, DATA_VENCIMENTO, VALOR_MENSALIDADE, ID_ASSOCIADO) 
+                VALUES({get_last_id}, {Mensal}, '{data_mensalidade}', '{data_vencimento}', {valor_mensalidade}, {id_associado});
             """)
         db.session.commit()
-        flash(f"Mensalidade cadastrada!", "success")
+
+        query_nome_associado = db.engine.execute(f"SELECT NOME_COMPLETO FROM ASSOCIADO WHERE ID = {id_associado};")
+        get_nome_associado = query_nome_associado.fetchone()
+
+        flash(f"Mensalidade cadastrada para {get_nome_associado[0]}!", "success")
         return redirect(url_for('page_mensalidade_form'))
 
-    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = isMensal)
+    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = isMensal, lista_associados = query_associados)
+
+
+@app.route('/<int:id>/mensalidade_consulta' , methods=["GET", "POST"])
+def page_mensalidade_consulta(id):
+    isMensal = bool(True)
+    query_associados_mensalidade = db.engine.execute(f"SELECT A.NOME_COMPLETO, M.* FROM MENSALIDADE M INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) WHERE M.ID = {id};")
+
+    return render_template("financeiro/mensalidade/mensalidade_consulta.html", eh_Mensal = isMensal, lista_associado_mensalidade = query_associados_mensalidade)
+
+
+@app.route('/<int:id>/delete_mensalidade')
+def delete_mensalidade(id):
+    db.engine.execute(f"DELETE FROM MENSALIDADE WHERE ID = {id};")
+    db.session.commit()
+    return redirect(url_for('page_mensalidade_lista'))
+
+
 
 
 # --------------------------------------------------
 #     Pagamento
 # --------------------------------------------------
-
-# /<int:id>/associado_atualiza
-@app.route('/pagamento_form' , methods=["GET", "POST"])
-def page_pagamento_form():
-    pagamento_confirmado = bool(True)
-    query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;")
-    query_count_mensalidade = db.engine.execute("SELECT COUNT(*) FROM PAGAMENTO;")
-
+@app.route('/<int:id>/pagamento_form' , methods=["GET", "POST"])
+def page_pagamento_form(id):
+    query_count_pagamento = db.engine.execute("SELECT MAX(ID) FROM PAGAMENTO;")
+    query_Men_Ass_Pag = db.engine.execute(f'''
+        SELECT A.ID, A.NOME_COMPLETO, M.*, P.*  FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        WHERE M.ID = {id};
+    ''')
+    
     data_pagamento = request.form.get('data_pagamento')
     valor_pagamento = request.form.get('valor_pagamento')
-    get_status_pagamento = request.form.get('status_pagamento')
+    id_status_pagamento = request.form.get('status_pagamento')
+    
 
     if (request.method == 'POST'):
-        get_id = query_count_mensalidade.fetchone()
-        get_last_id = get_id[0] + 1
+        get_id = query_count_pagamento.fetchone()
+        if (get_id[0] == None):
+            get_last_id = 1
+        else:
+            get_last_id = get_id[0] + 1
 
-        table_pagamento = pagamento(get_last_id, data_pagamento, valor_pagamento, pagamento_confirmado, get_status_pagamento)
-        db.session.add(table_pagamento)
+        db.engine.execute(f'''
+            INSERT INTO PAGAMENTO (ID, DATA_PAGAMENTO, VALOR_PAGAMENTO, PAGAMENTO_CONFIRMADO, ID_STATUS_PAGAMENTO, ID_MENSALIDADE) 
+            VALUES ({get_last_id}, '{data_pagamento}', {valor_pagamento}, TRUE, {id_status_pagamento}, {id});
+        ''')
+        return redirect(url_for('page_mensalidade_lista'))
 
-    return render_template("financeiro/pagamento/pagamento_form.html", status_pagamento = query_status_pagamento, _pagamento_confirmado = pagamento_confirmado)
+    return render_template("financeiro/pagamento/pagamento_form.html", query_Men_Ass_Pag = query_Men_Ass_Pag, query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;"), date_today = date.today())
+
+
+# @app.route('/pagamento_lista' , methods=["GET", "POST"])
+# def page_pagamento_lista():
+#     return render_template("financeiro/pagamento/pagamento_lista.html")
 
 
 
@@ -366,13 +423,18 @@ def page_login_access():
 
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf_login)
+        
+        tem_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_without_mask}' AND PASSWORD_LOGIN = '{password_login}';")
+
         query_login_admin = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_without_mask}' AND PASSWORD_LOGIN = '{password_login}';")
+        
         get_admin = query_login_admin.fetchone()
 
-        if (get_admin[0] == 0):
-            return redirect(url_for('page_principal'))
+        if (tem_login.fetchone()):
+            if (get_admin[0] == 0):
+                return redirect(url_for('page_principal'))
         else:
-            print("somente administrativo pode entrar!")
+            flash(f"Login não existe ou está bloqueado!", "error")
 
     return render_template("login/login_access.html")
 

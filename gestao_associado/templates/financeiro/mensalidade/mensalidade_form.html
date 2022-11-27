@@ -4,19 +4,28 @@
 <hr>
 
 {% with messages = get_flashed_messages() %}
-{% if messages %}
-<div class=flashes>
-    <div class="alert alert-success text-center" role="alert">
-        {% for message in messages %}
-        <h4>{{ message }}</h4>
-        {% endfor %}
+    {% if messages %}
+    <div class=flashes>
+        <div class="alert alert-success text-center" role="alert">
+            {% for message in messages %}
+                <h4>{{ message }}</h4>
+            {% endfor %}
+        </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 {% endwith %}
 
 <div>
     <form action="{{url_for('page_mensalidade_form')}}" method='POST' class="form-control p-5">
+        <div class="mb-3">
+            <label class="fw-bold">Associado:</label>
+            <select name="id_nome_associado" class="form-select">
+                <option selected></option>
+                {% for lista_associados in lista_associados %}
+                    <option value="{{lista_associados.id}}">{{lista_associados.nome_completo}}</option>
+                {% endfor %}
+            </select>
+        </div>
         <div class="mb-3">
             <label class="fw-bold px-10" style="
             padding-right: 10px;">Tipo de Mensalidade:</label>
@@ -31,13 +40,14 @@
             </div>
         </div>
         <div class="mb-3">
-            <label class="fw-bold" for="">Data Pagamento:</label>
-            <input type="date" class="p-2 form-control" name="data_pagamento" placeholder="00/00/0000" required>
+            <label class="fw-bold" for="">Data Início:</label>
+            <input type="date" class="p-2 form-control" name="data_mensalidade" placeholder="00/00/0000" required>
         </div>
         <div class="mb-3">
             <label class="fw-bold" for="">Data Vencimento:</label>
             <input type="date" class="p-2 form-control" name="data_vencimento" placeholder="00/00/0000" required>
         </div>
+        <label class="fw-bold" for="">Valor Mensalidade:</label>
         <div class="input-group mb-3">
             <span class="input-group-text">R$</span>
             <input type="text" id="money" class="p-2 form-control" name="valor_mensalidade" placeholder="0000" required>

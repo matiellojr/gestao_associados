@@ -66,11 +66,15 @@
                     <a href="{{lista[2]}}/mensalidade_consulta" class="btn btn-primary btn-xs">
                         <i class="bi bi-pencil"> Consultar</i>
                     </a>
-                    <!-- Button trigger modal -->
-                    <a href="{{lista[2]}}/pagamento_form" 
-                        class="btn btn-success">
-                            Pagamento
-                    </a>
+
+                    {% if lista.id_status_pagamento == 1 %}
+                        <a class="btn btn-success disabled">Pagamento</a>
+                    {% elif lista.id_status_pagamento == 2 %}
+                        <a href="{{lista[2]}}/pagamento_form" class="btn btn-success">Pagamento</a>
+                    {% else %}
+                        <a href="{{lista[2]}}/pagamento_form" class="btn btn-success">Pagamento</a>
+                    {% endif %}
+
                     <a href="{{lista[2]}}/delete_mensalidade" class="btn btn-danger" onclick="return confirm('Deseja excluir essa mensalidade?')" >
                         <i class="bi bi-trash"> Excluir</i>
                     </a>

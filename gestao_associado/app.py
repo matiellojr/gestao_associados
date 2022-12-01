@@ -250,7 +250,7 @@ def page_associado_lista():
     return render_template("associado/associado_lista.html", lista_associados = query_lista)
 
 
-@app.route('/<int:id>/associado_atualiza' , methods=["GET", "POST"])
+@app.route('/<int:id>/associado_atualiza', methods=["GET", "POST"])
 def page_associado_atualiza(id):
     query_tipos_sanguineos = db.engine.execute("SELECT * FROM TIPOS_SANGUINEO;")
     query_estado_civil = db.engine.execute('SELECT * FROM ESTADO_CIVIL;')
@@ -290,7 +290,35 @@ def page_associado_atualiza(id):
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'), cidades_sp = ufbr.list_cidades(sigla='SP'))
+    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, 
+    unidade_federativa = ufbr.list_uf,
+    cidades_ac = ufbr.list_cidades(sigla='AC'),
+    cidades_al = ufbr.list_cidades(sigla='AL'),
+    cidades_ap = ufbr.list_cidades(sigla='AP'),
+    cidades_am = ufbr.list_cidades(sigla='AM'),
+    cidades_ba = ufbr.list_cidades(sigla='BA'),
+    cidades_ce = ufbr.list_cidades(sigla='CE'),
+    cidades_df = ufbr.list_cidades(sigla='DF'),
+    cidades_es = ufbr.list_cidades(sigla='ES'),
+    cidades_go = ufbr.list_cidades(sigla='GO'),
+    cidades_ma = ufbr.list_cidades(sigla='MA'),
+    cidades_mt = ufbr.list_cidades(sigla='MT'),
+    cidades_ms = ufbr.list_cidades(sigla='MS'),
+    cidades_mg = ufbr.list_cidades(sigla='MG'),
+    cidades_pa = ufbr.list_cidades(sigla='PA'),
+    cidades_pb = ufbr.list_cidades(sigla='PB'),
+    cidades_pr = ufbr.list_cidades(sigla='PR'),
+    cidades_pe = ufbr.list_cidades(sigla='PE'),
+    cidades_pi = ufbr.list_cidades(sigla='PI'),
+    cidades_rj = ufbr.list_cidades(sigla='RJ'),
+    cidades_rn = ufbr.list_cidades(sigla='RN'),
+    cidades_rs = ufbr.list_cidades(sigla='RS'),
+    cidades_ro = ufbr.list_cidades(sigla='RO'),
+    cidades_rr = ufbr.list_cidades(sigla='RR'),
+    cidades_sc = ufbr.list_cidades(sigla='SC'),
+    cidades_sp = ufbr.list_cidades(sigla='SP'),
+    cidades_se = ufbr.list_cidades(sigla='SE'),
+    cidades_to = ufbr.list_cidades(sigla='TO'))
 
 
 # --------------------------------------------------
@@ -310,7 +338,7 @@ def page_mensalidade_lista():
     return render_template("financeiro/mensalidade/mensalidade_lista.html", lista_mensalidades_associado = query_lista, query_status_pagamento = query_status_pagamento)
 
 
-@app.route('/mensalidade_form' , methods=["GET", "POST"])
+@app.route('/mensalidade_form', methods=["GET","POST"])
 def page_mensalidade_form():
     isMensal = bool(True)
     query_mensalidade = db.engine.execute("SELECT * FROM MENSALIDADE;")
@@ -492,7 +520,34 @@ def page_login_form():
             db.session.commit()
             return redirect(url_for('page_login_access'))
 
-    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, cidades_sc = ufbr.list_cidades(sigla='SC'), cidades_pr = ufbr.list_cidades(sigla='PR'), cidades_rs = ufbr.list_cidades(sigla='RS'), cidades_sp = ufbr.list_cidades(sigla='SP'))
+    return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, 
+    cidades_ac = ufbr.list_cidades(sigla='AC'),
+    cidades_al = ufbr.list_cidades(sigla='AL'),
+    cidades_ap = ufbr.list_cidades(sigla='AP'),
+    cidades_am = ufbr.list_cidades(sigla='AM'),
+    cidades_ba = ufbr.list_cidades(sigla='BA'),
+    cidades_ce = ufbr.list_cidades(sigla='CE'),
+    cidades_df = ufbr.list_cidades(sigla='DF'),
+    cidades_es = ufbr.list_cidades(sigla='ES'),
+    cidades_go = ufbr.list_cidades(sigla='GO'),
+    cidades_ma = ufbr.list_cidades(sigla='MA'),
+    cidades_mt = ufbr.list_cidades(sigla='MT'),
+    cidades_ms = ufbr.list_cidades(sigla='MS'),
+    cidades_mg = ufbr.list_cidades(sigla='MG'),
+    cidades_pa = ufbr.list_cidades(sigla='PA'),
+    cidades_pb = ufbr.list_cidades(sigla='PB'),
+    cidades_pr = ufbr.list_cidades(sigla='PR'),
+    cidades_pe = ufbr.list_cidades(sigla='PE'),
+    cidades_pi = ufbr.list_cidades(sigla='PI'),
+    cidades_rj = ufbr.list_cidades(sigla='RJ'),
+    cidades_rn = ufbr.list_cidades(sigla='RN'),
+    cidades_rs = ufbr.list_cidades(sigla='RS'),
+    cidades_ro = ufbr.list_cidades(sigla='RO'),
+    cidades_rr = ufbr.list_cidades(sigla='RR'),
+    cidades_sc = ufbr.list_cidades(sigla='SC'),
+    cidades_sp = ufbr.list_cidades(sigla='SP'),
+    cidades_se = ufbr.list_cidades(sigla='SE'),
+    cidades_to = ufbr.list_cidades(sigla='TO'))
     # http://jsfiddle.net/XH42p/
 
 

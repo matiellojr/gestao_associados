@@ -81,17 +81,86 @@
                         <label for="">Cidade:</label>
                         <select name="cidade" class="form-select" required>
                             <option selected></option>
-                            {% for lista in cidades_pr %}
-                                <option data-uf="PR" value="{{lista}}">{{lista}}</option>
+                            {% for cities_pr in cidades_pr %}
+                                <option data-uf="PR" value="{{cities_pr}}">{{cities_pr}}</option>                                
                             {% endfor %}
-                            {% for lista in cidades_sc %}
-                                <option data-uf="SC" value="{{lista}}">{{lista}}</option>
+                            {% for cities_sc in cidades_sc %}
+                                <option data-uf="SC" value="{{cities_sc}}">{{cities_sc}}</option>
                             {% endfor %}
-                            {% for lista in cidades_rs %}
-                                <option data-uf="RS" value="{{lista}}">{{lista}}</option>
+                            {% for cities_rs in cidades_rs %}
+                                <option data-uf="RS" value="{{cities_rs}}">{{cities_rs}}</option>                                
                             {% endfor %}
-                            {% for lista in cidades_sp %}
-                                <option data-uf="SP" value="{{lista}}">{{lista}}</option>
+                            {% for cities_sp in cidades_sp %}
+                                <option data-uf="SP" value="{{cities_sp}}">{{cities_sp}}</option>
+                            {% endfor %}
+                            {% for cities_rj in cidades_rj %}                                
+                                <option data-uf="RJ" value="{{cities_rj}}">{{cities_rj}}</option>
+                            {% endfor %}
+                            {% for cidades_es in cidades_es %}
+                                <option data-uf="ES" value="{{cidades_es}}">{{cidades_es}}</option>
+                            {% endfor %}
+                            {% for cidades_mg in cidades_mg %}
+                                <option data-uf="MG" value="{{cidades_mg}}">{{cidades_mg}}</option>
+                            {% endfor %}
+                            {% for cidades_al in cidades_al %}
+                                <option data-uf="AL" value="{{cidades_al}}">{{cidades_al}}</option>
+                            {% endfor %}
+                            {% for cidades_ac in cidades_ac %}
+                                <option data-uf="AC" value="{{cidades_ac}}">{{cidades_ac}}</option>
+                            {% endfor %}
+                            {% for cidades_ap in cidades_ap %}
+                                <option data-uf="AP" value="{{cidades_ap}}">{{cidades_ap}}</option>
+                            {% endfor %}
+                            {% for cidades_am in cidades_am %}
+                                <option data-uf="AM" value="{{cidades_am}}">{{cidades_am}}</option>
+                            {% endfor %}
+                            {% for cidades_ba in cidades_ba %}
+                                <option data-uf="BA" value="{{cidades_ba}}">{{cidades_ba}}</option>
+                            {% endfor %}
+                            {% for cidades_ce in cidades_ce %}
+                                <option data-uf="CE" value="{{cidades_ce}}">{{cidades_ce}}</option>
+                            {% endfor %}
+                            {% for cidades_go in cidades_go %}                                
+                                <option data-uf="GO" value="{{cidades_go}}">{{cidades_go}}</option>
+                            {% endfor %}
+                            {% for cidades_ma in cidades_ma %}
+                                <option data-uf="MA" value="{{cidades_ma}}">{{cidades_ma}}</option>
+                            {% endfor %}
+                            {% for cidades_ms in cidades_ms %}
+                                <option data-uf="MS" value="{{cidades_ms}}">{{cidades_ms}}</option>
+                            {% endfor %}
+                            {% for cidades_mt in cidades_mt %}
+                                <option data-uf="MT" value="{{cidades_mt}}">{{cidades_mt}}</option>
+                            {% endfor %}
+                            {% for cidades_pa in cidades_pa %}
+                                <option data-uf="PA" value="{{cidades_pa}}">{{cidades_pa}}</option>
+                            {% endfor %}
+                            {% for cidades_pb in cidades_pb %}
+                                <option data-uf="PB" value="{{cidades_pb}}">{{cidades_pb}}</option>
+                            {% endfor %}
+                            {% for cidades_pe in cidades_pe %}
+                                <option data-uf="PE" value="{{cidades_pe}}">{{cidades_pe}}</option>
+                            {% endfor %}
+                            {% for cidades_pi in cidades_pi %}
+                                <option data-uf="PI" value="{{cidades_pi}}">{{cidades_pi}}</option>
+                            {% endfor %}
+                            {% for cidades_rn in cidades_rn %}
+                                <option data-uf="RN" value="{{cidades_rn}}">{{cidades_rn}}</option>
+                            {% endfor %}
+                            {% for cidades_ro in cidades_ro %}
+                                <option data-uf="RO" value="{{cidades_ro}}">{{cidades_ro}}</option>
+                            {% endfor %}
+                            {% for cidades_rr in cidades_rr %}
+                                <option data-uf="RR" value="{{cidades_rr}}">{{cidades_rr}}</option>                            
+                            {% endfor %}
+                            {% for cidades_se in cidades_se %}
+                                <option data-uf="SE" value="{{cidades_se}}">{{cidades_se}}</option>
+                            {% endfor %}
+                            {% for cidades_to in cidades_to %}
+                                <option data-uf="TO" value="{{cidades_to}}">{{cidades_to}}</option>
+                            {% endfor %}
+                            {% for cidades_df in cidades_df %}
+                                <option data-uf="DF" value="{{cidades_df}}">{{cidades_df}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -139,6 +208,9 @@
                 <div class="mb-3">
                     <button class="btn btn-success">Cadastrar</button>
                 </div>
+                <a href="" class="btn btn-primary btn-xs">
+                    <i class="bi bi-pencil"> Consultar</i>
+                </a>
             </div>
         </form>
     </div>    

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% block conteudo %}
 <h2 class="pt-3 text-center">Lista de Associados</h2>
 <hr>
@@ -17,7 +17,7 @@
                 <th>{{lista.id}}</th>
                 <td>{{lista.nome_completo}}</td>
                 <td>
-                    <a href="{{lista[0]}}/associado_atualiza" class="btn btn-warning btn-xs">
+                    <a href="/{{lista[0]}}/associado_atualiza_admin" class="btn btn-warning btn-xs">
                         <i class="bi bi-pencil"> Editar</i>
                     </a>
                 </td>

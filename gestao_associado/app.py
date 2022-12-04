@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash
+from flask import Flask, render_template, request, url_for, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 import sqlalchemy.orm as orm
@@ -10,13 +10,14 @@ from functions import validacao_cpf
 import psycopg2
 
 
+login_logado = True
+
 app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///moviestest.sqlite3'
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+psycopg2://postgres:admin@localhost/gestao_associados_asblu"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
 
 class associado(db.Model):
     id = sa.Column(sa.Integer, primary_key = True)
@@ -237,11 +238,29 @@ def execute_insert():
         ''')
 
 
-@app.route('/')
-def page_principal():
-    return render_template("index.html")
+# @app.route('/base')
+# def navbar_base():
+#     query_lista = db.engine.execute("SELECT * FROM ASSOCIADO ORDER BY ID;")
+#     return render_template("base.html", lista_associados = query_lista)
 
 
+
+
+@app.route('/<int:id>/a')
+def page_principal_associado(id):
+    query_login_associado = db.engine.execute(f'''
+        SELECT A.*, L.*, I.TIPO FROM ASSOCIADO A 
+        INNER JOIN LOGIN L ON (A.ID = L.ID_ASSOCIADO)
+        INNER JOIN IDENTIFICACAO I ON (A.ID_IDENTIFICACAO = I.ID)
+        WHERE L.ID_ASSOCIADO = {id};
+    ''')
+    get = query_login_associado.fetchone()
+
+    return render_template("index.html", id_associado = get[0], get = get)
+
+@app.route('/index_admin')
+def page_principal_admin():
+    return render_template("index_admin.html")
 
 
 @app.route('/associado_lista')
@@ -250,14 +269,15 @@ def page_associado_lista():
     return render_template("associado/associado_lista.html", lista_associados = query_lista)
 
 
-@app.route('/<int:id>/associado_atualiza', methods=["GET", "POST"])
-def page_associado_atualiza(id):
+@app.route('/<int:id>/associado_atualiza_admin', methods=["GET", "POST"])
+def page_associado_atualiza_admin(id):
+    _query_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE ID_ASSOCIADO = {id};")
     query_tipos_sanguineos = db.engine.execute("SELECT * FROM TIPOS_SANGUINEO;")
     query_estado_civil = db.engine.execute('SELECT * FROM ESTADO_CIVIL;')
     query_associados = db.engine.execute(f"SELECT * FROM ASSOCIADO WHERE ID = {id} ORDER BY ID;")
     query_identificacao = db.engine.execute('SELECT * FROM IDENTIFICACAO;')
     query_status_associado = db.engine.execute('SELECT * FROM status_associado;')
-
+    
 
     # se clicar no botão Atualizar, no form associado_atualiza
     if (request.method == 'POST'):
@@ -290,8 +310,81 @@ def page_associado_atualiza(id):
             db.session.commit()
             return redirect(url_for('page_associado_lista'))
 
-    return render_template("associado/associado_atualiza.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, 
+    return render_template("associado/associado_atualiza_admin.html", _query_associados = query_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, login = _query_login,
     unidade_federativa = ufbr.list_uf,
+    cidades_ac = ufbr.list_cidades(sigla='AC'),
+    cidades_al = ufbr.list_cidades(sigla='AL'),
+    cidades_ap = ufbr.list_cidades(sigla='AP'),
+    cidades_am = ufbr.list_cidades(sigla='AM'),
+    cidades_ba = ufbr.list_cidades(sigla='BA'),
+    cidades_ce = ufbr.list_cidades(sigla='CE'),
+    cidades_df = ufbr.list_cidades(sigla='DF'),
+    cidades_es = ufbr.list_cidades(sigla='ES'),
+    cidades_go = ufbr.list_cidades(sigla='GO'),
+    cidades_ma = ufbr.list_cidades(sigla='MA'),
+    cidades_mt = ufbr.list_cidades(sigla='MT'),
+    cidades_ms = ufbr.list_cidades(sigla='MS'),
+    cidades_mg = ufbr.list_cidades(sigla='MG'),
+    cidades_pa = ufbr.list_cidades(sigla='PA'),
+    cidades_pb = ufbr.list_cidades(sigla='PB'),
+    cidades_pr = ufbr.list_cidades(sigla='PR'),
+    cidades_pe = ufbr.list_cidades(sigla='PE'),
+    cidades_pi = ufbr.list_cidades(sigla='PI'),
+    cidades_rj = ufbr.list_cidades(sigla='RJ'),
+    cidades_rn = ufbr.list_cidades(sigla='RN'),
+    cidades_rs = ufbr.list_cidades(sigla='RS'),
+    cidades_ro = ufbr.list_cidades(sigla='RO'),
+    cidades_rr = ufbr.list_cidades(sigla='RR'),
+    cidades_sc = ufbr.list_cidades(sigla='SC'),
+    cidades_sp = ufbr.list_cidades(sigla='SP'),
+    cidades_se = ufbr.list_cidades(sigla='SE'),
+    cidades_to = ufbr.list_cidades(sigla='TO'))
+
+
+@app.route('/<int:id>/associado_atualiza_associado', methods=["GET", "POST"])
+def page_atualiza_associado(id):
+    _query_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE ID_ASSOCIADO = {id};")
+    query_tipos_sanguineos = db.engine.execute("SELECT * FROM TIPOS_SANGUINEO;")
+    query_estado_civil = db.engine.execute('SELECT * FROM ESTADO_CIVIL;')
+    query_associados = db.engine.execute(f"SELECT * FROM ASSOCIADO WHERE ID = {id} ORDER BY ID;")
+    lista_associados = db.engine.execute(f"SELECT * FROM ASSOCIADO WHERE ID = {id} ORDER BY ID;")
+    query_identificacao = db.engine.execute('SELECT * FROM IDENTIFICACAO;')
+    query_status_associado = db.engine.execute('SELECT * FROM status_associado;')
+    
+    get_id_associado = query_associados.fetchone()
+
+    # se clicar no botão Atualizar, no form associado_atualiza
+    if (request.method == 'POST'):
+        cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(request.form['cpf'])
+        if not(validacao_cpf.Cpf.validate(cpf_without_mask)):
+            cpf_error = request.form['cpf']
+            flash(f"O CPF está incorreto: {cpf_error}!", "error")
+        else:
+            data_atualizada = date.today()
+            data_cadastro = request.form['data_cadastro']
+            cpf = cpf_without_mask
+            nome_completo = request.form['nome_completo']
+            endereco = request.form['endereco']
+            email = request.form['email']
+            cidade = request.form['cidade']
+            uf = request.form['uf']
+            tipo_sanguineo = request.form['tipo_sanguineo']
+            data_nascimento = request.form['data_nascimento']
+            telefone = request.form['telefone']
+            estado_civil = request.form['estado_civil']
+            situacao_trabalho = request.form['situacao_trabalho']
+            como_identifica = request.form['como_identifica']
+            quantidades_filhos = request.form['quantidades_filhos']
+
+            db.engine.execute(
+                f"""
+                    UPDATE ASSOCIADO SET DATA_CADASTRO='{data_cadastro}', DATA_ATUALIZADA='{data_atualizada}', CPF='{cpf}', NOME_COMPLETO='{nome_completo}', ENDERECO='{endereco}', CIDADE='{cidade}', UF='{uf}', EMAIL='{email}', DATA_NASCIMENTO='{data_nascimento}', TELEFONE='{telefone}', ID_ESTADO_CIVIL={estado_civil}, ID_IDENTIFICACAO={como_identifica}, SITUACAO_TRABALHO='{situacao_trabalho}', ID_TIPO_SANGUINEO={tipo_sanguineo}, QUANTIDADES_FILHOS={quantidades_filhos} WHERE ID={id};
+                """)
+            db.session.commit()
+            flash(f"Cadastro atualizado!", "success")
+            return render_template("associado/associado_atualiza_associado.html", id_associado = get_id_associado[0])
+
+    return render_template("associado/associado_atualiza_associado.html", _query_associados = lista_associados, identificacao = query_identificacao, tipos_sanguineos = query_tipos_sanguineos, estado_civil = query_estado_civil, _status_associado = query_status_associado, login = _query_login, id_associado = get_id_associado[0], unidade_federativa = ufbr.list_uf,
     cidades_ac = ufbr.list_cidades(sigla='AC'),
     cidades_al = ufbr.list_cidades(sigla='AL'),
     cidades_ap = ufbr.list_cidades(sigla='AP'),
@@ -376,8 +469,9 @@ def page_mensalidade_form():
 
         query_nome_associado = db.engine.execute(f"SELECT NOME_COMPLETO FROM ASSOCIADO WHERE ID = {id_associado};")
         get_nome_associado = query_nome_associado.fetchone()
-
-        flash(f"Mensalidade cadastrada para {get_nome_associado[0]}!", "success")
+        
+        if (get_nome_associado):
+            flash(f"Mensalidade cadastrada para {get_nome_associado[0]}!", "success")
         return redirect(url_for('page_mensalidade_form'))
 
     return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = isMensal, lista_associados = query_associados)
@@ -443,8 +537,56 @@ def page_pagamento_form(id):
 # -------------------------------------------------------------
 #         Login
 # -------------------------------------------------------------
-@app.route('/login_access', methods=["GET", "POST"])
-def page_login_access():
+@app.route('/logout')
+def logout_administrador():
+    global login_logado
+    session.pop('login', None)
+    session.pop('password_login', None)
+    if login_logado:
+        login_logado = False
+        flash(f"Deslogado com sucesso!", "success")
+
+    return redirect(url_for('page_login_admin'))
+
+
+@app.route('/admin', methods=["GET", "POST"])
+def page_login_admin():
+    global login_logado
+
+    if (request.method == 'POST'):
+        tem_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{request.form['login']}' AND PASSWORD_LOGIN = '{request.form['password_login']}';")
+
+        if (tem_login.fetchone()):
+            session['login'] = request.form['login']
+            session['password_login'] = request.form['password_login']
+            login_logado = True
+
+            query_login_admin = db.engine.execute(f"SELECT ID_TIPO_LOGIN, ID_ASSOCIADO FROM LOGIN WHERE CPF_LOGIN = '{session['login']}' AND PASSWORD_LOGIN = '{session['password_login']}';")
+            get = query_login_admin.fetchone()
+
+            if (get[0] == 0):
+                return redirect(url_for('page_principal_admin'))
+            else:
+                flash(f"Somente o Administrador pode entrar!", "error")
+        else:
+            flash(f"O Login ou a Senha está errada!", "error")
+
+    return render_template("login/admin/login_admin.html")
+
+@app.route('/')
+def logout_associado():
+    global login_logado
+    session.pop('login', None)
+    session.pop('password_login', None)
+    if login_logado:
+        login_logado = False
+        flash(f"Deslogado com sucesso!", "success")
+
+    return redirect(url_for('page_login_associado'))
+
+
+@app.route('/associado', methods=["GET", "POST"])
+def page_login_associado():
     cpf_login = request.form.get('cpf_login')
     password_login = request.form.get('password_login')
 
@@ -452,19 +594,24 @@ def page_login_access():
     if (request.method == 'POST'):
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf_login)
         
-        tem_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_without_mask}' AND PASSWORD_LOGIN = '{password_login}';")
-
-        query_login_admin = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{cpf_without_mask}' AND PASSWORD_LOGIN = '{password_login}';")
-        
-        get_admin = query_login_admin.fetchone()
+        tem_login = db.engine.execute(f'''
+            SELECT A.*, L.* FROM ASSOCIADO A 
+            INNER JOIN LOGIN L ON (A.ID = L.ID_ASSOCIADO)
+            WHERE L.CPF_LOGIN = '{cpf_without_mask}' AND L.PASSWORD_LOGIN = '{password_login}' AND NOT(ID_TIPO_LOGIN = 0) AND A.ID_STATUS_ASSOCIADO = 1;
+        ''')
 
         if (tem_login.fetchone()):
-            if (get_admin[0] == 0):
-                return redirect(url_for('page_principal'))
-        else:
-            flash(f"Login não existe ou está bloqueado!", "error")
+            query_login_associado = db.engine.execute(f"SELECT ID_TIPO_LOGIN, ID_ASSOCIADO FROM LOGIN WHERE CPF_LOGIN = '{cpf_without_mask}' AND PASSWORD_LOGIN = '{password_login}';")
+            get = query_login_associado.fetchone()
 
-    return render_template("login/login_access.html")
+            if (get[0] == 1):
+                return redirect(url_for('page_principal_associado', id = get[1]))
+        else:
+            flash(f'''
+            O Login ou a Senha está errada, ou está bloqueada! 
+            \n Se deseja reativar a conta, falar com o administrador!''', "error")
+
+    return render_template("login/associado/login_associado.html")
 
 
 @app.route('/login_form', methods=["GET", "POST"])

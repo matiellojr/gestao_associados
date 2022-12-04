@@ -1,13 +1,13 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% block conteudo %}
 <h2 class="pt-3 text-center">Cadastro de Mensalidade</h2>
 <hr>
 
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
+{% with messages_mensalidade = get_flashed_messages() %}
+    {% if messages_mensalidade %}
     <div class=flashes>
         <div class="alert alert-success text-center" role="alert">
-            {% for message in messages %}
+            {% for message in messages_mensalidade %}
                 <h4>{{ message }}</h4>
             {% endfor %}
         </div>

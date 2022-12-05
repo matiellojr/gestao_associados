@@ -1,8 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% block conteudo %}
 <h2 class="pt-3 text-center">Lista de Mensalidade</h2>
 <hr>
 
+{% if _get_count > 0 %}
 <table class="table table-bordered table-hover">
     <thead class="table-secondary">
         <tr class="text-center">
@@ -16,7 +17,7 @@
             <th>Ações</th>
         </tr>
     </thead>
-    {% for lista in lista_mensalidades_associado %}
+        {% for lista in lista_mensalidades_associado %}
         <tbody class="table-hover">
             <tr>
                 <td>{{lista[1]}}</td>
@@ -54,7 +55,7 @@
                         </h5>
                     {% elif lista.id_status_pagamento == 2 %}
                         <h5>
-                            <span class="badge text-bg-danger">{{lista.status}}</span>
+                            <span class="badge text-bg-danger"></span>
                         </h5>
                     {% else %}
                         <h5>
@@ -63,16 +64,20 @@
                     {% endif %}
                     </td>    
                 <td>
-                    <a href="{{lista[2]}}/mensalidade_consulta" class="btn btn-primary btn-xs">
-                        <i class="bi bi-pencil"> Consultar</i>
+                    <a href="{{lista[2]}}/mensalidade_consulta_admin" class="btn btn-primary btn-xs">
+                        <i class="bi bi-list"> Consultar</i>
                     </a>
 
                     {% if lista.id_status_pagamento == 1 %}
                         <a class="btn btn-success disabled">Pagamento</a>
                     {% elif lista.id_status_pagamento == 2 %}
-                        <a href="{{lista[2]}}/pagamento_form" class="btn btn-success">Pagamento</a>
+                        <a href="{{lista[2]}}/pagamento_form_admin" class="btn btn-success">
+                            <i class="bi bi-currency-dollar"> Pagamento</i>
+                        </a>
                     {% else %}
-                        <a href="{{lista[2]}}/pagamento_form" class="btn btn-success">Pagamento</a>
+                        <a href="{{lista[2]}}/pagamento_form_admin" class="btn btn-success">
+                            <i class="bi bi-currency-dollar"> Pagamento</i>
+                        </a>
                     {% endif %}
 
                     <a href="{{lista[2]}}/delete_mensalidade" class="btn btn-danger" onclick="return confirm('Deseja excluir essa mensalidade?')" >
@@ -81,10 +86,13 @@
                 </td>
             </tr>
         </tbody>
-    {% endfor %}
-</table>
-
-{% block modal %}{% endblock modal %}
+        {% endfor %}
+    </table>
+{% else %}
+<div class="alert alert-danger text-center" role="alert">
+    <h1>Não há mensalidades dos Associados!</h1>
+</div>    
+{% endif %}
 
 {% endblock conteudo %}
 

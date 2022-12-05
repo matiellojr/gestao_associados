@@ -55,6 +55,16 @@
         </div>
 
         <div class="mb-3">
+            <label class="fw-bold">Status de Mensalidade:</label>
+            <select name="id_status_mensalidade" class="form-select">
+                <option selected></option>
+                {% for lista_status_mensalidade in lista_status_mensalidade %}
+                    <option value="{{lista_status_mensalidade.id}}">{{lista_status_mensalidade.status}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
             <button class="btn btn-primary fw-bold">Adicionar</button>
         </div>
     </form>

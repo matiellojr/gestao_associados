@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Lista de Mensalidade - {{nome_completo}}</h2>
+<hr>
+
+{% if get_count > 0 %}
+    <table class="table table-bordered table-hover">
+        <thead class="table-secondary">
+            <tr class="text-center">
+                <th>Status de Mensalidade</th>
+                <th>Tipo Mensalidade</th>
+                <th>Data de Vencimento</th>
+                <th>Valor da Mensalidade</th>
+                <th>Data de Pagamento</th>
+                <th>Valor de Pagamento</th>
+                <th>Status de Pagamento</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        {% for lista in lista_mensalidades_associado %}
+            <tbody class="table-hover">
+                <tr>
+                    <td class="text-center">
+                            {% if get_status_mensalidade[0] == 1 %}
+                                <h5>
+                                    <span class="badge text-bg-warning">{{lista_status.status}}</span>
+                                </h5>
+                            {% elif get_status_mensalidade[0] == 2 %}
+                                <h5>
+                                    <span class="badge text-bg-success">Pago!</span>
+                                </h5>
+                            {% elif get_status_mensalidade[0] == 3 %}
+                                <h5>
+                                    <span class="badge text-bg-danger">{{lista_status.status}}</span>
+                                </h5>
+                            {% else %}
+                                <h5>
+                                    <span class="badge text-bg-light">S/N</span>
+                                </h5>
+                            {% endif %}
+                    </td>    
+
+                    {% if lista.ehMensal %}
+                        <th class="text-center">
+                            <h5>
+                                <span class="badge text-bg-primary">Mensal</span> 
+                            </h5>
+                        </th>
+                    {% else %}
+                        <th class="text-center">
+                            <h5>
+                                <span class="badge text-bg-secondary">Anual</span>
+                            </h5>
+                        </th>
+                    {% endif %}
+                    
+                    <td class="text-center">
+                        {{lista.data_vencimento.strftime('%d/%m/%Y')}}
+                    </td>
+
+                    <td class="text-center">
+                        R$ {{"%.2f" % lista.valor_mensalidade}}
+                    </td>
+                    <td class="text-center">
+                        {{"" if lista.data_pagamento == None else lista.data_pagamento.strftime('%d/%m/%Y')}}
+                    </td>
+                    <td class="text-center">
+                        {{"" if lista.valor_pagamento == None else "R$ %.2f" % lista.valor_pagamento }}
+                    </td>    
+                    <td class="text-center">
+                        {% if lista.id_status_pagamento == 1 %}
+                            <h5>
+                                <span class="badge text-bg-success">{{lista.status}}</span>
+                            </h5>
+                        {% elif lista.id_status_pagamento == 2 %}
+                            <h5>
+                                <span class="badge text-bg-danger">{{lista.status}}</span>
+                            </h5>
+                        {% else %}
+                            <h5>
+                                <span class="badge text-bg-danger">Não Pago</span>
+                            </h5>
+                        {% endif %}
+                    </td>    
+                    <td>
+                        {% if lista.id_status_pagamento == 1 %}
+                            <a class="btn btn-success disabled">Pagamento</a>
+                        {% elif lista.id_status_pagamento == 2 %}
+                            <a href="/{{lista[2]}}/pagamento_form" class="btn btn-success">
+                                <i class="bi bi-currency-dollar"> Pagamento</i>
+                            </a>
+                        {% else %}
+                            <a href="/{{lista[2]}}/pagamento_form" class="btn btn-success">
+                                <i class="bi bi-currency-dollar"> Pagamento</i>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        {% endfor %}
+    </table>
+{% else %}
+<div class="alert alert-danger text-center" role="alert">
+    <h1>Não há mensalidades!</h1>
+</div>
+{% endif %}
+
+{% block modal %}{% endblock modal %}
+
+{% endblock conteudo %}
+

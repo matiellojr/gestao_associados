@@ -1,18 +1,18 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% block conteudo %}
 <h2 class="pt-3 text-center">Pagamento de Mensalidade</h2>
 <hr>
 
 <div>
     {% for lista in query_Men_Ass_Pag %}
-    <form action="{{url_for('page_pagamento_form', id = lista[2])}}" method='POST' class="form-control">
+    <form action="{{url_for('page_pagamento_form_admin', id = lista[2])}}" method='POST' class="form-control">
         <div class="mb-3">
             <label class="fw-bold px-10">Associado:</label>
             <input type="text" class="p-2 form-control" name="nome_associado" placeholder="" value="{{lista[1]}}" disabled>
         </div>
         <div class="mb-3">
             <label class="fw-bold px-10">Data vencimento:</label>
-            <input type="date" class="p-2 form-control" name="nome_associado" placeholder="" value="{{lista.data_vencimento}}" disabled>
+            <input type="date" class="p-2 form-control" value="{{lista.data_vencimento}}" disabled>
         </div>
         <div class="mb-3">
             <label class="fw-bold px-10">Valor da Mensalidade:</label>
@@ -32,7 +32,7 @@
             <label class="fw-bold">Status:</label>
             <select name="status_pagamento" class="form-select">
                 {% for lista_status_pagamento in query_status_pagamento %}
-                    <option selected value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.status}}</option>
+                    <option value="{{lista_status_pagamento.id}}">{{lista_status_pagamento.status}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -41,7 +41,7 @@
         <div class="mb-3">
             <button class="btn btn-success">
                 <i class="bi bi-save"> 
-                    <b>Pagar</b>
+                    <b>Salvar</b>
                 </i> 
             </button>
         </div>

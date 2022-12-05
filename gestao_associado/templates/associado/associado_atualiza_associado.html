@@ -20,7 +20,7 @@
         <div class="mb-3">
             {% for lista_status in _status_associado %}
                 {% if _query_associados.id_status_associado == lista_status.id %}
-                    <input type="text" class="p-2 form-control" name="status_associado" value="{{lista_status.status}}" readonly>
+                    <input type="text" class="p-2 form-control" name="status_associado" value="{{lista_status.status}}" disabled readonly>
                 {% endif %}
             {% endfor %}
         </div>

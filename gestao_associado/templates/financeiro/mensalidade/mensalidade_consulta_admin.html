@@ -1,0 +1,53 @@
+{% extends 'base_admin.html' %}
+{% block conteudo %}
+<h2 class="pt-3 text-center">Consulta de Mensalidade</h2>
+<hr>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class=flashes>
+        <div class="alert alert-success text-center" role="alert">
+            {% for message in messages %}
+                <h4>{{ message }}</h4>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{% endwith %}
+
+<div>
+    {% for mensalidade in lista_associado_mensalidade %}
+    <form action="{{url_for('page_mensalidade_consulta_admin', id = mensalidade.id)}}" method='POST' class="form-control p-5">
+        <div class="mb-3">
+            <label class="fw-bold" for="">Associado:</label>
+            <input type="text" class="p-2 fw-bold form-control" name="nome_completo" value="{{mensalidade.nome_completo}}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold px-10" style="
+            padding-right: 10px;">Tipo de Mensalidade:</label>
+            {% if mensalidade.ehMensal %}
+                <label class="form-check-label" for="inlineRadio1">Mensal</label>
+            {% else %}
+                <label class="form-check-label" for="inlineRadio2">Anual</label>
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold" for="">Data Início:</label>
+            <input type="date" class="p-2 form-control" name="data_pagamento" value="{{mensalidade.data_mensalidade}}" placeholder="00/00/0000" disabled>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold" for="">Data Vencimento:</label>
+            <input type="date" class="p-2 form-control" name="data_vencimento" value="{{mensalidade.data_vencimento}}" placeholder="00/00/0000" disabled>
+        </div>
+
+        <label class="fw-bold" for="">Valor Mensalidade:</label>
+        <div class="input-group mb-3">
+            <span class="input-group-text">R$</span>
+            <input type="text"  class="p-2 form-control" name="valor_mensalidade" value="{{"%.2f" % mensalidade.valor_mensalidade}}" disabled>
+        </div>
+    </form>
+    {% endfor %}
+</div>
+{% endblock conteudo %}

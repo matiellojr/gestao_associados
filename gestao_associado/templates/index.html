@@ -2,21 +2,23 @@
 {% block conteudo %}
 <div class="text-center pt-4">
     
+  <div class="d-flex justify-content-center"> 
     <div class="card mb-3" style="max-width: 540px;">
-        <div class="row g-0">
-            <div class="col-md-4" style="border: 2px solid black;">
-                <img src="https://findicons.com/files/icons/129/soft_scraps/128/user_administrator_green_01.png" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">{{get.nome_completo}}</h5>
-                <h6 class="card-subtitle mb-2">{{get.data_nascimento.strftime('%d/%m/%Y')}}</h6>
-                <h6 class="card-subtitle mb-2">{{get.tipo}}</h6>
-              </div>
-            </div>
+      <div class="row g-0">
+        <div class="col-md-4" style="border: 2px solid black;">
+            <img src="https://findicons.com/files/icons/129/soft_scraps/128/user_administrator_green_01.png" class="img-fluid rounded-start" alt="...">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">{{get.nome_completo}}</h5>
+            <h6 class="card-subtitle mb-2">Data de Nascimento: {{get.data_nascimento.strftime('%d/%m/%Y')}}</h6>
+            <h6 class="card-subtitle mb-2">Associado desde {{get.data_cadastro.strftime('%d/%m/%Y')}}</h6>
+            <h6 class="card-subtitle mb-2">{{get.tipo}}</h6>
           </div>
         </div>
+      </div>
     </div>
+  </div>  
 </div>
 
 {% endblock conteudo %}

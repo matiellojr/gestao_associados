@@ -238,16 +238,11 @@ def execute_insert():
         ''')
 
 
-# @app.route('/base')
-# def navbar_base():
-#     query_lista = db.engine.execute("SELECT * FROM ASSOCIADO ORDER BY ID;")
-#     return render_template("base.html", lista_associados = query_lista)
-
-
-
-
-@app.route('/<int:id>/a')
+@app.route('/<int:id>/inicio')
 def page_principal_associado(id):
+    if not(session.get("login")):
+        return redirect("/associado")
+
     query_login_associado = db.engine.execute(f'''
         SELECT A.*, L.*, I.TIPO FROM ASSOCIADO A 
         INNER JOIN LOGIN L ON (A.ID = L.ID_ASSOCIADO)
@@ -255,22 +250,31 @@ def page_principal_associado(id):
         WHERE L.ID_ASSOCIADO = {id};
     ''')
     get = query_login_associado.fetchone()
+    print(get[0])
 
     return render_template("index.html", id_associado = get[0], get = get)
 
 @app.route('/index_admin')
 def page_principal_admin():
+    if not(session.get("login")):
+        return redirect("/admin")
     return render_template("index_admin.html")
 
 
 @app.route('/associado_lista')
 def page_associado_lista():
+    if not(session.get("login")):
+        return redirect("/admin")
+
     query_lista = db.engine.execute("SELECT * FROM ASSOCIADO ORDER BY ID;")
     return render_template("associado/associado_lista.html", lista_associados = query_lista)
 
 
 @app.route('/<int:id>/associado_atualiza_admin', methods=["GET", "POST"])
 def page_associado_atualiza_admin(id):
+    if not(session.get("login")):
+        return redirect("/admin")
+
     _query_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE ID_ASSOCIADO = {id};")
     query_tipos_sanguineos = db.engine.execute("SELECT * FROM TIPOS_SANGUINEO;")
     query_estado_civil = db.engine.execute('SELECT * FROM ESTADO_CIVIL;')
@@ -343,6 +347,9 @@ def page_associado_atualiza_admin(id):
 
 @app.route('/<int:id>/associado_atualiza_associado', methods=["GET", "POST"])
 def page_atualiza_associado(id):
+    if not(session.get("login")):
+        return redirect("/associado")
+
     _query_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE ID_ASSOCIADO = {id};")
     query_tipos_sanguineos = db.engine.execute("SELECT * FROM TIPOS_SANGUINEO;")
     query_estado_civil = db.engine.execute('SELECT * FROM ESTADO_CIVIL;')
@@ -417,32 +424,97 @@ def page_atualiza_associado(id):
 # --------------------------------------------------
 #     Mensalidade
 # --------------------------------------------------
-@app.route('/mensalidade_lista')
+@app.route('/mensalidade_lista_admin')
 def page_mensalidade_lista():
+    if not(session.get("login")):
+        return redirect("/admin")
+
     query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;")
     query_lista = db.engine.execute('''
+        SELECT A.ID, A.NOME_COMPLETO, M.*, P.*, ST.* FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        LEFT JOIN STATUS_PAGAMENTO ST ON (ST.ID = P.ID_STATUS_PAGAMENTO)
+        ORDER BY 1;
+    ''')
+
+
+    count_mensalidade = db.engine.execute('''
+        SELECT COUNT(*) FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        LEFT JOIN STATUS_PAGAMENTO ST ON (ST.ID = P.ID_STATUS_PAGAMENTO);
+    ''')
+    get_count = count_mensalidade.fetchone()
+
+    return render_template("financeiro/mensalidade/mensalidade_lista_admin.html", lista_mensalidades_associado = query_lista, query_status_pagamento = query_status_pagamento, _get_count = get_count[0])
+
+
+@app.route('/<int:id>/mensalidade_lista_asssociado')
+def page_mensalidade_lista_associado(id):
+    if not(session.get("login")):
+        return redirect("/associado")
+
+    query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;")
+    query_lista_mensalidade = db.engine.execute(f'''
         SELECT A.ID, A.NOME_COMPLETO, M.*, P.*, ST.*  FROM MENSALIDADE M 
         INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
         LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
         LEFT JOIN STATUS_PAGAMENTO ST ON (ST.ID = P.ID_STATUS_PAGAMENTO)
+        WHERE A.ID = {id}
         ORDER BY M.DATA_VENCIMENTO ASC;
     ''')
 
-    return render_template("financeiro/mensalidade/mensalidade_lista.html", lista_mensalidades_associado = query_lista, query_status_pagamento = query_status_pagamento)
+    query_associado_nome = db.engine.execute(f'''
+        SELECT ID, NOME_COMPLETO FROM ASSOCIADO WHERE ID = {id};
+    ''')
+    get = query_associado_nome.fetchone()
+    
+    count_mensalidade = db.engine.execute(f'''
+        SELECT COUNT(*) FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        LEFT JOIN STATUS_PAGAMENTO ST ON (ST.ID = P.ID_STATUS_PAGAMENTO)
+        WHERE A.ID = {id};
+    ''')
+    get_count = count_mensalidade.fetchone() 
+    
+    status_mensalidade_id = db.engine.execute(f'''
+        SELECT SM.ID, SM.STATUS FROM MENSALIDADE M
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        LEFT JOIN STATUS_MENSALIDADE SM ON (SM.ID = M.ID_STATUS_MENSALIDADE)
+        WHERE A.ID = {id};
+    ''')
+    get_status_mensalidade = status_mensalidade_id.fetchone() 
+    get_id_status = get_status_mensalidade[0]
+       
+
+    return render_template("financeiro/mensalidade/mensalidade_lista_associado.html", lista_mensalidades_associado = query_lista_mensalidade, id_associado = get[0], nome_completo = get[1], status_mensalidade = query_status_pagamento, get_count = get_count[0], get_status_mensalidade = get_id_status)
+
 
 
 @app.route('/mensalidade_form', methods=["GET","POST"])
 def page_mensalidade_form():
-    isMensal = bool(True)
+    if not(session.get("login")):
+        return redirect("/admin")
+
     query_mensalidade = db.engine.execute("SELECT * FROM MENSALIDADE;")
+    query_status_mensalidade = db.engine.execute("SELECT * FROM STATUS_MENSALIDADE;")
     query_count_mensalidade = db.engine.execute("SELECT MAX(ID) FROM MENSALIDADE;")
-    query_associados = db.engine.execute("SELECT ID, NOME_COMPLETO FROM ASSOCIADO WHERE ID_STATUS_ASSOCIADO = 1 ORDER BY 2;")
+    query_associados_habilitados = db.engine.execute('''
+        SELECT A.ID, A.NOME_COMPLETO FROM ASSOCIADO A 
+        INNER JOIN LOGIN L ON (A.ID = L.ID_ASSOCIADO)
+        WHERE A.id_status_associado = 1
+        ORDER BY 2;
+    ''')
 
     data_mensalidade = request.form.get('data_mensalidade')
     data_vencimento = request.form.get('data_vencimento')
     valor_mensalidade = request.form.get('valor_mensalidade')
     mensalidade_mensal = request.form.get('tipo_mensalidade')
     id_associado = request.form.get('id_nome_associado')
+    id_status_mensalidade = request.form.get('id_status_mensalidade')
 
 
     if (request.method == 'POST'):
@@ -462,8 +534,8 @@ def page_mensalidade_form():
 
         db.engine.execute(
             f"""
-                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_MENSALIDADE, DATA_VENCIMENTO, VALOR_MENSALIDADE, ID_ASSOCIADO) 
-                VALUES({get_last_id}, {Mensal}, '{data_mensalidade}', '{data_vencimento}', {valor_mensalidade}, {id_associado});
+                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_MENSALIDADE, DATA_VENCIMENTO, VALOR_MENSALIDADE, ID_ASSOCIADO, ID_STATUS_MENSALIDADE) 
+                VALUES({get_last_id}, {Mensal}, '{data_mensalidade}', '{data_vencimento}', {valor_mensalidade}, {id_associado}, {id_status_mensalidade});
             """)
         db.session.commit()
 
@@ -474,19 +546,34 @@ def page_mensalidade_form():
             flash(f"Mensalidade cadastrada para {get_nome_associado[0]}!", "success")
         return redirect(url_for('page_mensalidade_form'))
 
-    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = isMensal, lista_associados = query_associados)
+    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = bool(True), lista_associados = query_associados_habilitados, lista_status_mensalidade = query_status_mensalidade)
+
+# @app.route('/<int:id>/mensalidade_consulta_associado' , methods=["GET", "POST"])
+# def page_mensalidade_consulta_associado(id):
+#     isMensal = bool(True)
+#     query_associados_mensalidade = db.engine.execute(f"SELECT A.NOME_COMPLETO, M.* FROM MENSALIDADE M INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) WHERE M.ID = {id};")
+
+#     return render_template("financeiro/mensalidade/mensalidade_consulta.html", eh_Mensal = isMensal, lista_associado_mensalidade = query_associados_mensalidade)
 
 
-@app.route('/<int:id>/mensalidade_consulta' , methods=["GET", "POST"])
-def page_mensalidade_consulta(id):
+@app.route('/<int:id>/mensalidade_consulta_admin' , methods=["GET", "POST"])
+def page_mensalidade_consulta_admin(id):
+    if not(session.get("login")):
+        return redirect("/admin")
+
     isMensal = bool(True)
-    query_associados_mensalidade = db.engine.execute(f"SELECT A.NOME_COMPLETO, M.* FROM MENSALIDADE M INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) WHERE M.ID = {id};")
+    query_associados_mensalidade = db.engine.execute(f"SELECT A.NOME_COMPLETO, M.* FROM MENSALIDADE M INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) WHERE M.ID = {id} ORDER BY A.ID;")
 
-    return render_template("financeiro/mensalidade/mensalidade_consulta.html", eh_Mensal = isMensal, lista_associado_mensalidade = query_associados_mensalidade)
+    if (request.method == 'POST'):
+        pass
+
+    return render_template("financeiro/mensalidade/mensalidade_consulta_admin.html", eh_Mensal = isMensal, lista_associado_mensalidade = query_associados_mensalidade,
+    lista_status_mensalidade = db.engine.execute("SELECT * FROM STATUS_MENSALIDADE;"))
 
 
 @app.route('/<int:id>/delete_mensalidade')
 def delete_mensalidade(id):
+    db.engine.execute(f"DELETE FROM PAGAMENTO WHERE ID_MENSALIDADE = {id};")
     db.engine.execute(f"DELETE FROM MENSALIDADE WHERE ID = {id};")
     db.session.commit()
     return redirect(url_for('page_mensalidade_lista'))
@@ -499,6 +586,59 @@ def delete_mensalidade(id):
 # --------------------------------------------------
 @app.route('/<int:id>/pagamento_form' , methods=["GET", "POST"])
 def page_pagamento_form(id):
+    if not(session.get("login")):
+        return redirect("/associado")
+
+    query_count_pagamento = db.engine.execute("SELECT MAX(ID) FROM PAGAMENTO;")
+
+    query_Men_Ass_Pag = db.engine.execute(f'''
+        SELECT A.ID, A.NOME_COMPLETO, M.*, P.*  FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        LEFT JOIN PAGAMENTO P ON (P.ID_MENSALIDADE = M.ID)
+        WHERE M.ID = {id};
+    ''')
+    lista_get_id_pagamento = db.engine.execute(f'''
+        SELECT A.ID, A.NOME_COMPLETO, M.* FROM MENSALIDADE M 
+        INNER JOIN ASSOCIADO A ON (A.ID = M.ID_ASSOCIADO) 
+        WHERE M.ID = {id};
+    ''')
+    get = lista_get_id_pagamento.fetchone()
+    
+  
+
+    data_pagamento = request.form.get('data_pagamento')
+    valor_pagamento = request.form.get('valor_pagamento')
+    id_status_pagamento = request.form.get('status_pagamento')
+   
+
+    if (request.method == 'POST'):
+        get_id = query_count_pagamento.fetchone()
+        if (get_id[0] == None):
+            get_last_id = 1
+        else:
+            get_last_id = get_id[0] + 1
+
+        db.engine.execute(f'''
+            INSERT INTO PAGAMENTO (ID, DATA_PAGAMENTO, VALOR_PAGAMENTO, PAGAMENTO_CONFIRMADO, ID_STATUS_PAGAMENTO, ID_MENSALIDADE) 
+            VALUES ({get_last_id}, '{data_pagamento}', {valor_pagamento}, TRUE, {id_status_pagamento}, {id});
+        ''')
+        db.engine.execute(f'''
+            UPDATE MENSALIDADE SET ID_STATUS_MENSALIDADE = 2 WHERE ID ={id});
+        ''')
+        return redirect(url_for('page_mensalidade_lista_associado', id = get[0]))
+
+    return render_template("financeiro/pagamento/pagamento_form.html", 
+    query_Men_Ass_Pag = query_Men_Ass_Pag, 
+    query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO ORDER BY ID DESC;"),  
+    date_today = date.today(), 
+    id_associado = get[0])
+
+
+@app.route('/<int:id>/pagamento_form_admin' , methods=["GET", "POST"])
+def page_pagamento_form_admin(id):
+    if not(session.get("login")):
+        return redirect("/admin")
+
     query_count_pagamento = db.engine.execute("SELECT MAX(ID) FROM PAGAMENTO;")
     query_Men_Ass_Pag = db.engine.execute(f'''
         SELECT A.ID, A.NOME_COMPLETO, M.*, P.*  FROM MENSALIDADE M 
@@ -510,7 +650,6 @@ def page_pagamento_form(id):
     data_pagamento = request.form.get('data_pagamento')
     valor_pagamento = request.form.get('valor_pagamento')
     id_status_pagamento = request.form.get('status_pagamento')
-    
 
     if (request.method == 'POST'):
         get_id = query_count_pagamento.fetchone()
@@ -525,7 +664,7 @@ def page_pagamento_form(id):
         ''')
         return redirect(url_for('page_mensalidade_lista'))
 
-    return render_template("financeiro/pagamento/pagamento_form.html", query_Men_Ass_Pag = query_Men_Ass_Pag, query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO;"), date_today = date.today())
+    return render_template("financeiro/pagamento/pagamento_form_admin.html", query_Men_Ass_Pag = query_Men_Ass_Pag, query_status_pagamento = db.engine.execute("SELECT * FROM STATUS_PAGAMENTO ORDER BY ID ASC;"), date_today = date.today())
 
 
 # @app.route('/pagamento_lista' , methods=["GET", "POST"])
@@ -537,62 +676,51 @@ def page_pagamento_form(id):
 # -------------------------------------------------------------
 #         Login
 # -------------------------------------------------------------
-@app.route('/logout')
+@app.route('/logout_admin')
 def logout_administrador():
-    global login_logado
     session.pop('login', None)
     session.pop('password_login', None)
-    if login_logado:
-        login_logado = False
-        flash(f"Deslogado com sucesso!", "success")
-
+    flash(f"Deslogado com sucesso!", "success")
     return redirect(url_for('page_login_admin'))
 
 
 @app.route('/admin', methods=["GET", "POST"])
 def page_login_admin():
-    global login_logado
-
     if (request.method == 'POST'):
         tem_login = db.engine.execute(f"SELECT ID_TIPO_LOGIN FROM LOGIN WHERE CPF_LOGIN = '{request.form['login']}' AND PASSWORD_LOGIN = '{request.form['password_login']}';")
 
         if (tem_login.fetchone()):
             session['login'] = request.form['login']
             session['password_login'] = request.form['password_login']
-            login_logado = True
 
             query_login_admin = db.engine.execute(f"SELECT ID_TIPO_LOGIN, ID_ASSOCIADO FROM LOGIN WHERE CPF_LOGIN = '{session['login']}' AND PASSWORD_LOGIN = '{session['password_login']}';")
             get = query_login_admin.fetchone()
 
             if (get[0] == 0):
                 return redirect(url_for('page_principal_admin'))
-            else:
-                flash(f"Somente o Administrador pode entrar!", "error")
         else:
-            flash(f"O Login ou a Senha está errada!", "error")
+            flash(f"Somente o Administrador pode entrar!", "error")
 
     return render_template("login/admin/login_admin.html")
 
 @app.route('/')
 def logout_associado():
-    global login_logado
     session.pop('login', None)
     session.pop('password_login', None)
-    if login_logado:
-        login_logado = False
-        flash(f"Deslogado com sucesso!", "success")
-
+    flash(f"Deslogado com sucesso!", "success")
     return redirect(url_for('page_login_associado'))
 
 
 @app.route('/associado', methods=["GET", "POST"])
 def page_login_associado():
-    cpf_login = request.form.get('cpf_login')
-    password_login = request.form.get('password_login')
-
-
     if (request.method == 'POST'):
+        cpf_login = request.form.get('cpf_login')
+        password_login = request.form.get('password_login')
+
         cpf_without_mask = validacao_cpf.Cpf.retirapontoshifen(cpf_login)
+
+        session['login'] = request.form['cpf_login']
+        session['password_login'] = request.form['password_login']
         
         tem_login = db.engine.execute(f'''
             SELECT A.*, L.* FROM ASSOCIADO A 
@@ -661,11 +789,11 @@ def page_login_form():
             get_id = query_quantidade_associados.fetchone()
             get_last_id = get_id[0] + 1
             table_associado = associado(get_last_id, cpf_without_mask, nome_completo, endereco, data_cadastro, cidade, uf, email, tipo_sanguineo, data_nascimento, data_atualizada, telefone, estado_civil, como_identifica, situacao_trabalho, quantidades_filhos, 1)
-            table_login = login(get_last_id, cpf_without_mask, password_login, False, get_last_id)
+            table_login = login(get_last_id, cpf_without_mask, password_login, 1, get_last_id)
             db.session.add(table_associado)
             db.session.add(table_login)
             db.session.commit()
-            return redirect(url_for('page_login_access'))
+            return redirect(url_for('page_login_associado'))
 
     return render_template("login/login_form.html", tipos = query_tipos_sanguineos, identificacao = query_identificacao, estado_civil = query_estado_civil, data_hoje=date.today(), unidade_federativa = ufbr.list_uf, 
     cidades_ac = ufbr.list_cidades(sigla='AC'),

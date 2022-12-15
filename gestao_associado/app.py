@@ -261,13 +261,12 @@ def page_principal_admin():
     return render_template("index_admin.html")
 
 
-@app.route('/associado_lista')
+@app.route('/associado_lista/')
 def page_associado_lista():
     if not(session.get("login")):
         return redirect("/admin")
 
-    query_lista = db.engine.execute("SELECT * FROM ASSOCIADO ORDER BY ID;")
-    return render_template("associado/associado_lista.html", lista_associados = query_lista)
+    return render_template("associado/associado_lista.html", lista_associados = db.engine.execute("SELECT * FROM ASSOCIADO ORDER BY ID;"))
 
 
 @app.route('/<int:id>/associado_atualiza_admin', methods=["GET", "POST"])
@@ -487,10 +486,11 @@ def page_mensalidade_lista_associado(id):
         WHERE A.ID = {id};
     ''')
     get_status_mensalidade = status_mensalidade_id.fetchone() 
-    get_id_status = get_status_mensalidade[0]
+    # get_id_status = get_status_mensalidade[0]
        
 
-    return render_template("financeiro/mensalidade/mensalidade_lista_associado.html", lista_mensalidades_associado = query_lista_mensalidade, id_associado = get[0], nome_completo = get[1], status_mensalidade = query_status_pagamento, get_count = get_count[0], get_status_mensalidade = get_id_status)
+    return render_template("financeiro/mensalidade/mensalidade_lista_associado.html", lista_mensalidades_associado = query_lista_mensalidade, id_associado = get[0], nome_completo = get[1], status_mensalidade = query_status_pagamento, get_count = get_count[0])
+    # get_status_mensalidade = get_id_status)
 
 
 
@@ -623,7 +623,7 @@ def page_pagamento_form(id):
             VALUES ({get_last_id}, '{data_pagamento}', {valor_pagamento}, TRUE, {id_status_pagamento}, {id});
         ''')
         db.engine.execute(f'''
-            UPDATE MENSALIDADE SET ID_STATUS_MENSALIDADE = 2 WHERE ID ={id});
+            UPDATE MENSALIDADE SET ID_STATUS_MENSALIDADE = 2 WHERE ID = {id};
         ''')
         return redirect(url_for('page_mensalidade_lista_associado', id = get[0]))
 

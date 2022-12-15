@@ -7,7 +7,7 @@
     <table class="table table-bordered table-hover">
         <thead class="table-secondary">
             <tr class="text-center">
-                <th>Status de Mensalidade</th>
+                <th>#</th>
                 <th>Tipo Mensalidade</th>
                 <th>Data de Vencimento</th>
                 <th>Valor da Mensalidade</th>
@@ -20,24 +20,8 @@
         {% for lista in lista_mensalidades_associado %}
             <tbody class="table-hover">
                 <tr>
-                    <td class="text-center">
-                            {% if get_status_mensalidade[0] == 1 %}
-                                <h5>
-                                    <span class="badge text-bg-warning">{{lista_status.status}}</span>
-                                </h5>
-                            {% elif get_status_mensalidade[0] == 2 %}
-                                <h5>
-                                    <span class="badge text-bg-success">Pago!</span>
-                                </h5>
-                            {% elif get_status_mensalidade[0] == 3 %}
-                                <h5>
-                                    <span class="badge text-bg-danger">{{lista_status.status}}</span>
-                                </h5>
-                            {% else %}
-                                <h5>
-                                    <span class="badge text-bg-light">S/N</span>
-                                </h5>
-                            {% endif %}
+                    <td>
+                       {{lista[2]}}                 
                     </td>    
 
                     {% if lista.ehMensal %}

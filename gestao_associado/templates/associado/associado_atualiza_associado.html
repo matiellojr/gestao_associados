@@ -271,9 +271,11 @@
         <div class="mb-3">
             <label for="">Estado Civil:</label>
             <select name="estado_civil" class="form-select">
-                {% for lista in estado_civil %}
-                    {% if _query_associados.id_estado_civil == lista.id %}
-                        <option selected value="{{lista.id}}">{{lista.tipo}} </option>
+                {% for lista_estado_civil in estado_civil %}
+                    {% if _query_associados.id_estado_civil == lista_estado_civil.id %}
+                        <option selected value="{{lista_estado_civil.id}}">{{lista_estado_civil.tipo}} </option>
+                    {% else %}
+                        <option value="{{lista_estado_civil.id}}">{{lista_estado_civil.tipo}} </option>
                     {% endif %}
                 {% endfor %}
             </select>

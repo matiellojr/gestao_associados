@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, flash, session
+from flask import *
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import relationship
 import sqlalchemy.orm as orm
@@ -204,11 +204,11 @@ def execute_insert():
 
     if not(tem_estado_civil.fetchone()):
         db.engine.execute('''
-            INSERT INTO ESTADO_CIVIL VALUES (1, 'Solteiro');
-            INSERT INTO ESTADO_CIVIL VALUES (2, 'Casado');
-            INSERT INTO ESTADO_CIVIL VALUES (3, 'Separado');
-            INSERT INTO ESTADO_CIVIL VALUES (4, 'Divorciado');
-            INSERT INTO ESTADO_CIVIL VALUES (5, 'Viúvo');
+            INSERT INTO ESTADO_CIVIL VALUES (1, 'Solteiro (a)');
+            INSERT INTO ESTADO_CIVIL VALUES (2, 'Casado (a)');
+            INSERT INTO ESTADO_CIVIL VALUES (3, 'Separado (a)');
+            INSERT INTO ESTADO_CIVIL VALUES (4, 'Divorciado (a)');
+            INSERT INTO ESTADO_CIVIL VALUES (5, 'Viúvo (a)');
         ''')
 
     if not(tem_status_associado.fetchone()):
@@ -498,7 +498,8 @@ def page_mensalidade_lista_associado(id):
 def page_mensalidade_form():
     if not(session.get("login")):
         return redirect("/admin")
-
+    
+    error = None
     query_mensalidade = db.engine.execute("SELECT * FROM MENSALIDADE;")
     query_status_mensalidade = db.engine.execute("SELECT * FROM STATUS_MENSALIDADE;")
     query_count_mensalidade = db.engine.execute("SELECT MAX(ID) FROM MENSALIDADE;")
@@ -518,35 +519,47 @@ def page_mensalidade_form():
 
 
     if (request.method == 'POST'):
-        get_id = query_count_mensalidade.fetchone()
-        if (get_id[0] == None):
-            get_last_id = 1
-        else:
-            get_last_id = get_id[0] + 1
-
-        # se o tipo for mensal, recebe True;
-        if bool(mensalidade_mensal):
-            Mensal = mensalidade_mensal
-        else:
-            # senão (se for anual) recebe false
-            Mensal = mensalidade_mensal
-            
-
-        db.engine.execute(
-            f"""
-                INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_MENSALIDADE, DATA_VENCIMENTO, VALOR_MENSALIDADE, ID_ASSOCIADO, ID_STATUS_MENSALIDADE) 
-                VALUES({get_last_id}, {Mensal}, '{data_mensalidade}', '{data_vencimento}', {valor_mensalidade}, {id_associado}, {id_status_mensalidade});
-            """)
-        db.session.commit()
-
         query_nome_associado = db.engine.execute(f"SELECT NOME_COMPLETO FROM ASSOCIADO WHERE ID = {id_associado};")
         get_nome_associado = query_nome_associado.fetchone()
+        nome_associado = get_nome_associado[0]
         
-        if (get_nome_associado):
-            flash(f"Mensalidade cadastrada para {get_nome_associado[0]}!", "success")
-        return redirect(url_for('page_mensalidade_form'))
+        query_mensalidade_associado = db.engine.execute(f'''
+            SELECT CAST(EXTRACT(MONTH FROM DATA_MENSALIDADE) AS INTEGER) AS MES, CAST(EXTRACT(YEAR FROM DATA_MENSALIDADE) AS INTEGER) AS ANO FROM MENSALIDADE WHERE ID_ASSOCIADO = {id_associado};
+        ''')
+        tem_mensalidade = query_mensalidade_associado.fetchall()
 
-    return render_template("financeiro/mensalidade/mensalidade_form.html", mensalidade = query_mensalidade, eh_Mensal = bool(True), lista_associados = query_associados_habilitados, lista_status_mensalidade = query_status_mensalidade)
+        lista_mensalidade = tem_mensalidade
+        for lista_mensalidade in lista_mensalidade:
+            month_mensalidade = lista_mensalidade[0]
+            year_mensalidade = lista_mensalidade[1]
+            if (int(month_mensalidade) == int(data_mensalidade[5:-3]) and int(year_mensalidade) == int(data_mensalidade[0:4])):
+                error = f"Mensalidade já está cadastrada para o(a) associado(a) {nome_associado} do {month_mensalidade}/{year_mensalidade}!"
+
+        if error == None:
+            get_id = query_count_mensalidade.fetchone()
+            if (get_id[0] == None):
+                get_last_id = 1
+            else:
+                get_last_id = get_id[0] + 1
+
+            # se o tipo for mensal, recebe True;
+            if bool(mensalidade_mensal):
+                Mensal = mensalidade_mensal
+            else:
+                # senão (se for anual) recebe false
+                Mensal = mensalidade_mensal
+                
+
+            db.engine.execute(
+                f"""
+                    INSERT INTO MENSALIDADE (ID, "ehMensal", DATA_MENSALIDADE, DATA_VENCIMENTO, VALOR_MENSALIDADE, ID_ASSOCIADO, ID_STATUS_MENSALIDADE) 
+                    VALUES({get_last_id}, {Mensal}, '{data_mensalidade}', '{data_vencimento}', {valor_mensalidade}, {id_associado}, {id_status_mensalidade});
+                """)
+            db.session.commit()
+
+            flash(f"Mensalidade cadastrada para {nome_associado}!", "success")
+            return redirect(url_for('page_mensalidade_form'))
+    return render_template("financeiro/mensalidade/mensalidade_form.html", error = error, mensalidade = query_mensalidade, eh_Mensal = bool(True), lista_associados = query_associados_habilitados, lista_status_mensalidade = query_status_mensalidade)
 
 # @app.route('/<int:id>/mensalidade_consulta_associado' , methods=["GET", "POST"])
 # def page_mensalidade_consulta_associado(id):

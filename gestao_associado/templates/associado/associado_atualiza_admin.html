@@ -279,6 +279,8 @@
                 {% for lista in estado_civil %}
                     {% if associado.id_estado_civil == lista.id %}
                         <option selected value="{{lista.id}}">{{lista.tipo}} </option>
+                    {% else %}
+                        <option value="{{lista.id}}">{{lista.tipo}}</option>
                     {% endif %}
                 {% endfor %}
             </select>

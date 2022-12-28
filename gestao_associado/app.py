@@ -523,6 +523,15 @@ def page_mensalidade_form():
         get_nome_associado = query_nome_associado.fetchone()
         nome_associado = get_nome_associado[0]
         
+        # se o tipo for mensal, recebe True
+        if bool(mensalidade_mensal):
+            Mensal = mensalidade_mensal
+            if (data_vencimento < data_mensalidade):
+                error = "Data de vencimento não pode ser antes que a Data de Início."
+        else:
+            # senão (se for anual) recebe false
+            Mensal = mensalidade_mensal
+
         query_mensalidade_associado = db.engine.execute(f'''
             SELECT CAST(EXTRACT(MONTH FROM DATA_MENSALIDADE) AS INTEGER) AS MES, CAST(EXTRACT(YEAR FROM DATA_MENSALIDADE) AS INTEGER) AS ANO FROM MENSALIDADE WHERE ID_ASSOCIADO = {id_associado};
         ''')
@@ -533,7 +542,10 @@ def page_mensalidade_form():
             month_mensalidade = lista_mensalidade[0]
             year_mensalidade = lista_mensalidade[1]
             if (int(month_mensalidade) == int(data_mensalidade[5:-3]) and int(year_mensalidade) == int(data_mensalidade[0:4])):
-                error = f"Mensalidade já está cadastrada para o(a) associado(a) {nome_associado} do {month_mensalidade}/{year_mensalidade}!"
+                if (error == None):
+                    error = f"Mensalidade já está cadastrada para o(a) associado(a) {nome_associado} do {month_mensalidade}/{year_mensalidade}!"
+                else:    
+                    error = error + f" e a mensalidade já está cadastrada para o(a) associado(a) {nome_associado} do {month_mensalidade}/{year_mensalidade}!"
 
         if error == None:
             get_id = query_count_mensalidade.fetchone()
@@ -541,14 +553,6 @@ def page_mensalidade_form():
                 get_last_id = 1
             else:
                 get_last_id = get_id[0] + 1
-
-            # se o tipo for mensal, recebe True;
-            if bool(mensalidade_mensal):
-                Mensal = mensalidade_mensal
-            else:
-                # senão (se for anual) recebe false
-                Mensal = mensalidade_mensal
-                
 
             db.engine.execute(
                 f"""

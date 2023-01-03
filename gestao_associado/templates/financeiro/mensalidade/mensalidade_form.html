@@ -3,33 +3,32 @@
 <h2 class="pt-3 text-center">Cadastro de Mensalidade</h2>
 <hr>
 
-
 {% if error %}
-    <div class="alert alert-danger text-center" role="alert">
-        <h5>{{error}}</h5>
-    </div>
+<div class="alert alert-danger text-center" role="alert">
+    <h5>{{error}}</h5>
+</div>
 {% endif %}
 
 {% with messages_success = get_flashed_messages(category_filter=["success"]) %}
-    {% if messages_success %}
-        <div class=messages_success role="alert">
-            {% for message in messages_mensalidade %}
-            <div class="alert alert-success text-center" role="alert">
-                <h5>{{message}}</h5>
-            </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages_success %}
+<div class=messages_success role="alert">
+    {% for message in messages_mensalidade %}
+    <div class="alert alert-success text-center" role="alert">
+        <h5>{{message}}</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
 <div>
     <form action="{{url_for('page_mensalidade_form')}}" method='POST' class="form-control p-5">
         <div class="mb-3">
-            <label class="fw-bold">Associado:</label>
+            <label class="fw-bold">Associado (a):</label>
             <select name="id_nome_associado" class="form-select">
-                <option selected></option>
+                <option selected value="0">Todos</option>
                 {% for lista_associados in lista_associados %}
-                    <option value="{{lista_associados.id}}">{{lista_associados.nome_completo}}</option>
+                <option value="{{lista_associados.id}}">{{lista_associados.nome_completo}}</option>
                 {% endfor %}
             </select>
         </div>
@@ -60,20 +59,30 @@
             <input type="text" id="money" class="p-2 form-control" name="valor_mensalidade" placeholder="0000" required>
             <span class="input-group-text">.00</span>
         </div>
-
+        
         <div class="mb-3">
             <label class="fw-bold">Status de Mensalidade:</label>
             <select name="id_status_mensalidade" class="form-select">
                 <option selected></option>
                 {% for lista_status_mensalidade in lista_status_mensalidade %}
-                    <option value="{{lista_status_mensalidade.id}}">{{lista_status_mensalidade.status}}</option>
+                <option value="{{lista_status_mensalidade.id}}">{{lista_status_mensalidade.status}}</option>
                 {% endfor %}
             </select>
         </div>
-
+        
         <div class="mb-3">
-            <button class="btn btn-primary fw-bold">Adicionar</button>
+            <button id="add_um" class="disabled btn btn-primary fw-bold">Adicionar</button>
+            
+            <a href="" class="btn btn-success" onclick="return confirm('Deseja adicionar essa mensalidade para todos os assiociados habilitados?')" id="add_todos" >
+                <i class="bi bi-file-plus"> 
+                    <b>Adicionar a todos os associados</b>
+                </i>                    
+            </a>
+            
         </div>
     </form>
 </div>
+
+<link href="{{url_for('.static', filename='css/button_disabled.css')}}" rel="stylesheet" >
+
 {% endblock conteudo %}
